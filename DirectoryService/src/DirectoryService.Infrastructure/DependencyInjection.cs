@@ -35,6 +35,7 @@ public static class DependencyInjection
     private static ILoggerFactory GetLoggerFactory() 
         => LoggerFactory.Create(o =>
         {
+            o.AddConsole();
             o.SetMinimumLevel(LogLevel.Warning);
         });
 }

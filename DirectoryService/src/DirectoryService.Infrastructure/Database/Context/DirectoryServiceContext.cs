@@ -10,6 +10,6 @@ public class DirectoryServiceContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
+        
     }
 }
