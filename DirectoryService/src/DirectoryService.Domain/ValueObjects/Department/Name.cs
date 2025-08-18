@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
 
-namespace DirectoryService.Domain.ValueObjects;
+namespace DirectoryService.Domain.ValueObjects.Department;
 
-public record Name
+public class Name : ValueObject
 {
     public string Value { get; } = null!;
 
@@ -26,5 +26,10 @@ public record Name
                 Constants.DepartmentConstants.MAX_LENGTH_NAME);
         
         return new Name(value);
+    }
+
+    protected override IEnumerable<object> GetEqualityComponents()
+    {
+        yield return Value;
     }
 }
