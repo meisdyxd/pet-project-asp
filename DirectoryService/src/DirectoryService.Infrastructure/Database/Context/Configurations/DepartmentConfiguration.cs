@@ -60,47 +60,5 @@ public class DepartmentConfiguration: IEntityTypeConfiguration<Department>
         builder.HasMany(d => d.ChildrenDepartments)
             .WithOne(cd => cd.Parent)
             .HasForeignKey("parent_id");
-
-        builder.HasMany(d => d.Locations)
-            .WithMany(l => l.Departments)
-            .UsingEntity<DepartmentLocation>(
-            r => r.HasOne(dl => dl.Location)
-                .WithMany()
-                .HasForeignKey(dl => dl.LocationId),
-            l => l.HasOne(dl => dl.Department)
-                .WithMany()
-                .HasForeignKey(dl => dl.DepartmentId),
-            j =>
-            {
-                j.ToTable("department_location");
-
-                j.HasKey(dl => new { dl.DepartmentId, dl.LocationId });
-
-                j.Property(dl => dl.DepartmentId)
-                    .HasColumnName("department_id");
-
-                j.Property(dl => dl.LocationId)
-                    .HasColumnName("location_id");
-            });
-
-        builder.HasMany(d => d.Positions)
-            .WithMany(p => p.Departments)
-            .UsingEntity<DepartmentPosition>(
-            r => r.HasOne(dp => dp.Position)
-                .WithMany()
-                .HasForeignKey(dp => dp.PositionId),
-            l => l.HasOne(dp => dp.Department)
-                .WithMany()
-                .HasForeignKey(dp => dp.DepartmentId),
-            j =>
-            {
-                j.ToTable("department_position");
-
-                j.Property(dp => dp.PositionId)
-                    .HasColumnName("position_id");
-
-                j.Property(dp => dp.DepartmentId)
-                    .HasColumnName("department_id");
-            });
     }
 }

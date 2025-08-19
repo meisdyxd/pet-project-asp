@@ -9,8 +9,8 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
 {
     protected Department(Guid id): base(id) { }
 
-    private readonly List<Location> _locations = [];
-    private readonly List<Position> _positions = [];
+    private readonly List<DepartmentLocation> _departmentLocations = [];
+    private readonly List<DepartmentPosition> _departmentPositions = [];
     private readonly List<Department> _childrenDepartments = [];
 
     public Name Name { get; private set; }
@@ -23,8 +23,8 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
 
     public Department? Parent { get; private set; }
     public IReadOnlyList<Department> ChildrenDepartments => _childrenDepartments;
-    public IReadOnlyList<Location> Locations => _locations;
-    public IReadOnlyList<Position> Positions => _positions;
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
 
 
     private Department(

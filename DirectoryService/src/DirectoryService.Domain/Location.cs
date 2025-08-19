@@ -9,7 +9,7 @@ public class Location: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
 {
     protected Location(Guid id) : base(id) { }
 
-    private readonly List<Department> _departments = [];
+    private readonly List<DepartmentLocation> _departmentsLocations = [];
 
     public Name Name { get; private set; } 
     public Address Address { get; private set; }
@@ -18,7 +18,7 @@ public class Location: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    public IReadOnlyList<Department> Departments => _departments;
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentsLocations;
 
     private Location(
     Name name,
