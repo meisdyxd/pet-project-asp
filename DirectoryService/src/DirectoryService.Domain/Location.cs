@@ -7,6 +7,8 @@ namespace DirectoryService.Domain;
 
 public class Location: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
 {
+    protected Location(Guid id) : base(id) { }
+
     private readonly List<Department> _departments = [];
 
     public Name Name { get; private set; } 
