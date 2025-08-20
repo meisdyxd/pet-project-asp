@@ -7,7 +7,9 @@ namespace DirectoryService.Domain;
 
 public class Location: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
 {
-    private readonly List<Department> _departments = [];
+    protected Location(Guid id) : base(id) { }
+
+    private readonly List<DepartmentLocation> _departmentsLocations = [];
 
     public Name Name { get; private set; } 
     public Address Address { get; private set; }
@@ -16,7 +18,7 @@ public class Location: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    public IReadOnlyList<Department> Departments => _departments;
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentsLocations;
 
     private Location(
     Name name,

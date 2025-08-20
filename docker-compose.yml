@@ -1,0 +1,20 @@
+services:
+  database:
+    image: postgres:latest
+    container_name: directory_service_db
+    environment:
+      POSTGRES_DB: directory-service
+      POSTGRES_USER: postgresql
+      POSTGRES_PASSWORD: postgresql
+    volumes:
+      - directory_service_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres_user -d DirectoryService"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  directory_service_pgdata:
