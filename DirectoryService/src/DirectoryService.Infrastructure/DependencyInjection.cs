@@ -1,4 +1,6 @@
-﻿using DirectoryService.Infrastructure.Database.Context;
+﻿using DirectoryService.Application.Interfaces.IRepositories;
+using DirectoryService.Infrastructure.Database.Context;
+using DirectoryService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +14,9 @@ public static class DependencyInjection
         this IServiceCollection services, 
         IConfiguration configuration)
     {
-        services.AddDbContext(configuration);
+        services
+            .AddDbContext(configuration)
+            .AddRepositories();
 
         return services;
     }
@@ -29,6 +33,13 @@ public static class DependencyInjection
             options.UseLoggerFactory(GetLoggerFactory());
         });
 
+        return services;
+    }
+
+    private static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<ILocationsRepository, LocationsRepository>();
+        
         return services;
     }
 
