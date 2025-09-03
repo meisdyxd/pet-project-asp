@@ -1,6 +1,9 @@
-﻿using DirectoryService.Application.Interfaces.IRepositories;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Interfaces.IRepositories;
+using DirectoryService.Contracts;
 using DirectoryService.Domain;
 using DirectoryService.Infrastructure.Database.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.Infrastructure.Repositories;
 
@@ -18,8 +21,16 @@ public class LocationsRepository : ILocationsRepository
         await _context.AddAsync(location, cancellationToken);
     }
 
-    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    public async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
     {
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+            return UnitResult.Success<Error>();
+        }
+        catch(Exception ex)
+        {
+            return Errors.DbErrors.WhenSave(ex.Message);
+        }
     }
 }

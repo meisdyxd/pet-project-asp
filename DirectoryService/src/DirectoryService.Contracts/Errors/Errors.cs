@@ -49,4 +49,13 @@ public static class Errors
         public static Error Lesser(string name, int value)
             => new($"{name} should be lesser than {value}", "invalid.value");
     }
+
+    public static class DbErrors
+    {
+        public static Error Default(string name)
+            => new($"DbError", "db.error");
+        
+        public static Error WhenSave(string message)
+            => new(message, "db.save.error");
+    }
 }
