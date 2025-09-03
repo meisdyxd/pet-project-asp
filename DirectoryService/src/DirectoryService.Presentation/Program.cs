@@ -1,4 +1,5 @@
-﻿using DirectoryService.Presentation.RegisterServices;
+﻿using DirectoryService.Application;
+using DirectoryService.Presentation.RegisterServices;
 using DirectoryService.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ var configuration = builder.Configuration;
 services
     .SwaggerConfigure()
     .AddInfrastructure(configuration)
+    .AddApplication()
     .AddControllers();
 
 var app = builder.Build();
