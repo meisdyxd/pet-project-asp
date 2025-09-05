@@ -1,13 +1,12 @@
 ﻿using DirectoryService.Application.CQRS.Commands.AddLocation;
-using DirectoryService.Contracts;
+using DirectoryService.Presentation.Extensions;
 using DirectoryService.Presentation.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.Presentation.Controllers;
 
-[ApiController]
 [Route("api/locations")]
-public class LocationsController : ControllerBase
+public class LocationsController : MainController
 {
     [HttpPost]
     public async Task<IActionResult> Add(
@@ -19,7 +18,7 @@ public class LocationsController : ControllerBase
         
         var result = await handler.Handle(command, cancellationToken);
         if(result.IsFailure)
-            return BadRequest(result.Error);
+            return result.Error.ToResponse();
         
         return Created();
     }

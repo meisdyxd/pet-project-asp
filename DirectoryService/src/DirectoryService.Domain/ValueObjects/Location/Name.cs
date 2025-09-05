@@ -16,6 +16,7 @@ public class Name : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
             return Errors.InvalidValue.Empty(nameof(Name).ToLower());
+            
 
         if (value.Length
             is < Constants.LocationConstants.MIN_LENGTH_NAME
