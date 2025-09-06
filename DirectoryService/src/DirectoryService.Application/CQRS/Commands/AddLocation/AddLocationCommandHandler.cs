@@ -2,6 +2,7 @@
 using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Application.Interfaces.IRepositories;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Common;
 using DirectoryService.Domain.ValueObjects.Location;
@@ -16,13 +17,12 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
     {
         _locationsRepository = locationsRepository;
     }
-
-
-    public async Task<UnitResult<Error>> Handle(AddLocationCommand command, CancellationToken cancellationToken)
+    
+    public async Task<UnitResult<ErrorList>> Handle(AddLocationCommand command, CancellationToken cancellationToken)
     {
         var name = Name.Create(command.Name);
         if (name.IsFailure)
-            return Errors.InvalidValue.Default("name");
+            return name.Error.ToErrorList();
         
         var address = Address.Create(
             command.Address.Country,
@@ -35,19 +35,19 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
             command.Address.Building,
             command.Address.Apartment);
         if (address.IsFailure)
-            return Errors.InvalidValue.Default("address");
+            return Errors.InvalidValue.Default("address").ToErrorList();
         
         var timezone = IANATimezone.Create(command.Timezone);
         if (timezone.IsFailure)
-            return Errors.InvalidValue.Default("timezone");
+            return Errors.InvalidValue.Default("timezone").ToErrorList();
         
         var location = Location.Create(name.Value, address.Value, timezone.Value);
         if (location.IsFailure)
-            return Errors.InvalidValue.Default("location");
+            return Errors.InvalidValue.Default("location").ToErrorList();
         
         await _locationsRepository.AddAsync(location.Value, cancellationToken);
         await _locationsRepository.SaveChangesAsync(cancellationToken);
 
-        return UnitResult.Success<Error>();
+        return UnitResult.Success<ErrorList>();
     }
 }
