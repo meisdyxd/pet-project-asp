@@ -3,6 +3,7 @@ using DirectoryService.Presentation.RegisterServices;
 using DirectoryService.Infrastructure;
 using DirectoryService.Presentation;
 using DirectoryService.Presentation.Middlewares;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,13 +14,14 @@ services
     .SwaggerConfigure()
     .AddInfrastructure(configuration)
     .AddApplication()
+    .ConfigureSerilog(configuration)
     .AddScoped<CustomExceptionMiddleware>()
     .AddControllers();
 
 var app = builder.Build();
 
 app.UseCustomExceptionMiddleware();
-
+app.UseSerilogRequestLogging();
 if (app.Environment.IsDevelopment())
 { 
     app.UseSwagger();

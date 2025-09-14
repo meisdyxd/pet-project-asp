@@ -6,16 +6,21 @@ using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Common;
 using DirectoryService.Domain.ValueObjects.Location;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.CQRS.Commands.AddLocation;
 
 public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
 {
     private readonly ILocationsRepository _locationsRepository;
-
-    public AddLocationCommandHandler(ILocationsRepository locationsRepository)
+    private readonly ILogger<AddLocationCommandHandler> _logger;
+    
+    public AddLocationCommandHandler(
+        ILocationsRepository locationsRepository, 
+        ILogger<AddLocationCommandHandler> logger)
     {
         _locationsRepository = locationsRepository;
+        _logger = logger;
     }
     
     public async Task<UnitResult<ErrorList>> Handle(AddLocationCommand command, CancellationToken cancellationToken)
@@ -46,8 +51,14 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
             return Errors.InvalidValue.Default("location").ToErrorList();
         
         await _locationsRepository.AddAsync(location.Value, cancellationToken);
-        await _locationsRepository.SaveChangesAsync(cancellationToken);
+        var result = await _locationsRepository.SaveChangesAsync(cancellationToken);
+        if (result.IsFailure)
+        {
+            _logger.LogError("Error when save location to DB");
+            return result.Error.ToErrorList();
+        }
 
+        _logger.LogInformation("Location with ID {ID} was successfully added.", location.Value.Id);
         return UnitResult.Success<ErrorList>();
     }
 }
