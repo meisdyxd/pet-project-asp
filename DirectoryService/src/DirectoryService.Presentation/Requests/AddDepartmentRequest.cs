@@ -10,5 +10,5 @@ public class AddDepartmentRequest
     public IEnumerable<Guid> LocationIds { get; init; } = [];
     
     public AddDepartmentCommand ToCommand()
-        => new AddDepartmentCommand(Name, Identifier, ParentId, LocationIds);
+        => new(Name, Identifier, ParentId, LocationIds);
 }

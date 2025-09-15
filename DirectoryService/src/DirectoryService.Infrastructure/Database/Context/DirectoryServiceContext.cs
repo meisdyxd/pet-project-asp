@@ -1,11 +1,19 @@
-﻿using DirectoryService.Domain;
+﻿using DirectoryService.Application.Interfaces;
+using DirectoryService.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.Infrastructure.Database.Context;
 
-public class DirectoryServiceContext : DbContext
+public class DirectoryServiceContext : DbContext, IReadDbContext
 {
     public DbSet<Department> Departments { get; set; }
+    public IQueryable<Department> DepartmentsRead => Departments.AsNoTracking();
+    
+    public DbSet<Position> Positions { get; set; }
+    public IQueryable<Position> PositionsRead => Positions.AsNoTracking();
+    
+    public DbSet<Location> Locations { get; set; }
+    public IQueryable<Location> LocationsRead => Locations.AsNoTracking();
     public DirectoryServiceContext(DbContextOptions options) : base(options)
     {
     }

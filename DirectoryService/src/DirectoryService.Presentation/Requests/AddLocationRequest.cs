@@ -10,5 +10,5 @@ public sealed record AddLocationRequest
     public string Timezone { get; init; } = null!;
 
     public AddLocationCommand ToCommand()
-        => new AddLocationCommand(Name, Address, Timezone);
+        => new(Name, Address, Timezone);
 }

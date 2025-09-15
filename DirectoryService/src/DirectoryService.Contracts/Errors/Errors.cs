@@ -67,6 +67,15 @@ public static class Errors
             => new($"DbError", "db.error");
         
         public static Error WhenSave(string message)
-            => new(message, "db.save.error");
+            => new(message, "db.error.save");
+        
+        public static Error CommitTransaction()
+            => new("Failed to commit transaction", "transaction.error.commit");
+        
+        public static Error RollbackTransaction()
+            => new("Failed to rollback transaction", "transaction.error.rollback");
+        
+        public static Error BeginTransaction()
+            => new("Failed to begin transaction", "transaction.error.begin");
     }
 }

@@ -20,6 +20,7 @@ public class Position : Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
 
     private Position(Name name, Description description)
     {
+        Id = Guid.NewGuid();
         Name = name;
         Description = description;
         IsActive = Constants.CommonConstants.IS_ACTIVE_DEFAULT;
@@ -30,5 +31,12 @@ public class Position : Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
     public static Result<Position, ErrorList> Create(Name name, Description description)
     {
         return new Position(name, description);
+    }
+
+    public void LinkWithDepartments(IEnumerable<Guid> departments)
+    {
+        var departmentPositions = departments
+            .Select(d => DepartmentPosition.Create(Id, d).Value);
+        _departmentPositions.AddRange(departmentPositions);
     }
 }
