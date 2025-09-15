@@ -17,7 +17,12 @@ public class AddDepartmentCommandValidator : AbstractValidator<AddDepartmentComm
         
         RuleFor(r => r.LocationIds)
             .Must(l => l.Any())
-            .WithError("locationIds", "LocationIds cannot be empty");
+            .WithError("locationIds", "LocationIds cannot be empty")
+            .Must(l =>
+            {
+                var enumerable = l.ToList();
+                return enumerable.Count == enumerable.Distinct().Count();
+            });
         
         RuleForEach(r => r.LocationIds)
             .NotEmpty()
