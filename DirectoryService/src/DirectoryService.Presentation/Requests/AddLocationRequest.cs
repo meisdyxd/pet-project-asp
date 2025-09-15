@@ -5,15 +5,10 @@ namespace DirectoryService.Presentation.Requests;
 
 public sealed record AddLocationRequest
 {
-    public string Name { get; init; }
-    public AddressDto Address { get; init; }
-    public string Timezone { get; init; }
-    
+    public string Name { get; init; } = null!;
+    public AddressDto Address { get; init; } = null!;
+    public string Timezone { get; init; } = null!;
+
     public AddLocationCommand ToCommand()
-        => new AddLocationCommand()
-        {
-            Address = this.Address,
-            Timezone = this.Timezone,
-            Name = this.Name
-        };
+        => new AddLocationCommand(Name, Address, Timezone);
 }

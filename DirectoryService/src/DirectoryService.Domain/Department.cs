@@ -44,7 +44,7 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public static Result<Department, Error> Create(
+    public static Result<Department, ErrorList> Create(
         Name name,
         Identifier identifier,
         Path path,

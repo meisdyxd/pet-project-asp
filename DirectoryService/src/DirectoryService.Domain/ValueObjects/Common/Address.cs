@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Net;
+using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
 
 namespace DirectoryService.Domain.ValueObjects.Common;
@@ -64,7 +65,7 @@ public class Address : ValueObject
     /// </summary>
     public string? Apartment { get; }
 
-    public static Result<Address, Error> Create(
+    public static Result<Address, ErrorList> Create(
         string country,
         string region,
         string city,
@@ -75,21 +76,26 @@ public class Address : ValueObject
         string? building = null,
         string? apartment = null)
     {
+        var errors = new List<Error>();
+        
         if (string.IsNullOrWhiteSpace(country))
-            return Errors.InvalidValue.Empty(nameof(country));
+            errors.Add(Errors.InvalidValue.Empty(nameof(country)));
 
         if (string.IsNullOrWhiteSpace(region))
-            return Errors.InvalidValue.Empty(nameof(region));
+            errors.Add(Errors.InvalidValue.Empty(nameof(region)));
 
         if (string.IsNullOrWhiteSpace(city))
-            return Errors.InvalidValue.Empty(nameof(city));
+            errors.Add(Errors.InvalidValue.Empty(nameof(city)));
 
         if (string.IsNullOrWhiteSpace(street))
-            return Errors.InvalidValue.Empty(nameof(street));
+            errors.Add(Errors.InvalidValue.Empty(nameof(street)));
 
         if (string.IsNullOrWhiteSpace(houseNumber))
-            return Errors.InvalidValue.Empty(nameof(houseNumber));
+            errors.Add(Errors.InvalidValue.Empty(nameof(houseNumber)));
 
+        if (errors.Count != 0)
+            return new ErrorList(errors, HttpStatusCode.BadRequest);
+        
         return new Address(
             country,
             region, 

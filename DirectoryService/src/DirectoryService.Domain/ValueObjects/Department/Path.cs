@@ -6,7 +6,7 @@ namespace DirectoryService.Domain.ValueObjects.Department;
 
 public class Path : ValueObject
 {
-    public string Value { get; } = null!;
+    public string Value { get; }
 
     private Path(string value)
     {

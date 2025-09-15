@@ -27,7 +27,7 @@ public class Position : Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public static Result<Position, Error> Create(Name name, Description description)
+    public static Result<Position, ErrorList> Create(Name name, Description description)
     {
         return new Position(name, description);
     }

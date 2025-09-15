@@ -19,7 +19,7 @@ public class CustomExceptionMiddleware : IMiddleware
         {
             await next(context);
         }
-        catch (Exception ex)
+        catch
         {
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             await context.Response.WriteAsJsonAsync(Envelope.Failure([Errors.Http.InternalServerError()]));

@@ -1,4 +1,5 @@
 using DirectoryService.Application.Interfaces.CQRS;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DirectoryService.Application;
@@ -7,7 +8,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddCQRS();
+        services
+            .AddCQRS()
+            .AddValidators();
 
         return services;
     }
@@ -28,6 +31,13 @@ public static class DependencyInjection
                 .AsSelfWithInterfaces()
                 .WithScopedLifetime();
         });
+        
+        return services;
+    }
+
+    private static IServiceCollection AddValidators(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
         
         return services;
     }

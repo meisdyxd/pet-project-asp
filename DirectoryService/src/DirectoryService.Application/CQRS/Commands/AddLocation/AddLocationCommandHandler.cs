@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Extensions;
 using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Application.Interfaces.IRepositories;
 using DirectoryService.Contracts;
@@ -6,6 +7,7 @@ using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Common;
 using DirectoryService.Domain.ValueObjects.Location;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.CQRS.Commands.AddLocation;
@@ -14,20 +16,28 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
 {
     private readonly ILocationsRepository _locationsRepository;
     private readonly ILogger<AddLocationCommandHandler> _logger;
+    private readonly IValidator<AddLocationCommand>  _validator;
     
     public AddLocationCommandHandler(
         ILocationsRepository locationsRepository, 
+        IValidator<AddLocationCommand> validator,
         ILogger<AddLocationCommandHandler> logger)
     {
         _locationsRepository = locationsRepository;
+        _validator = validator;
         _logger = logger;
     }
     
     public async Task<UnitResult<ErrorList>> Handle(AddLocationCommand command, CancellationToken cancellationToken)
     {
+        var resultValidation = await _validator.ValidateAsync(command, cancellationToken);
+        if (!resultValidation.IsValid)
+            return resultValidation.ToErrorList();
+        
+        /*
         var name = Name.Create(command.Name);
         if (name.IsFailure)
-            return name.Error.ToErrorList();
+            return name.Error;
         
         var address = Address.Create(
             command.Address.Country,
@@ -39,15 +49,29 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
             command.Address.District,
             command.Address.Building,
             command.Address.Apartment);
+        
         if (address.IsFailure)
             return Errors.InvalidValue.Default("address").ToErrorList();
         
         var timezone = IANATimezone.Create(command.Timezone);
         if (timezone.IsFailure)
             return Errors.InvalidValue.Default("timezone").ToErrorList();
+        */
+        var name = Name.Create(command.Name).Value;
+        var address = Address.Create(
+            command.Address.Country,
+            command.Address.Region,
+            command.Address.City,
+            command.Address.Street,
+            command.Address.HouseNumber,
+            command.Address.PostalCode,
+            command.Address.District,
+            command.Address.Building,
+            command.Address.Apartment).Value;
+        var timezone = IANATimezone.Create(command.Timezone).Value;
         
-        var location = Location.Create(name.Value, address.Value, timezone.Value);
-        if (location.IsFailure)
+        var location = Location.Create(name, address, timezone);
+        if (location.IsFailure) 
             return Errors.InvalidValue.Default("location").ToErrorList();
         
         await _locationsRepository.AddAsync(location.Value, cancellationToken);

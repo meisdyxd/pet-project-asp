@@ -1,30 +1,36 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Net;
+using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
 
 namespace DirectoryService.Domain.ValueObjects.Department;
 
 public class Identifier : ValueObject
 {
-    public string Value { get; } = null!;
+    public string Value { get; }
 
     private Identifier(string value)
     {
         Value = value;
     }
 
-    public static Result<Identifier, Error> Create(string value)
+    public static Result<Identifier, ErrorList> Create(string value)
     {
+        var errors = new List<Error>();
+        
         if (string.IsNullOrWhiteSpace(value))
-            return Errors.InvalidValue.Empty(nameof(Identifier).ToLower());
-
+            errors.Add(Errors.InvalidValue.Empty(nameof(Identifier).ToLower()));
+        
         if (value.Length
             is < Constants.DepartmentConstants.MIN_LENGTH_IDENTIFIER
             or > Constants.DepartmentConstants.MAX_LENGTH_IDENTIFIER)
-            return Errors.InvalidValue.IncorrectLength(
+            errors.Add(Errors.InvalidValue.IncorrectLength(
                 nameof(Identifier).ToLower(),
                 Constants.DepartmentConstants.MIN_LENGTH_IDENTIFIER,
-                Constants.DepartmentConstants.MAX_LENGTH_IDENTIFIER);
-
+                Constants.DepartmentConstants.MAX_LENGTH_IDENTIFIER));
+        
+        if (errors.Count != 0)
+            return new ErrorList(errors, HttpStatusCode.BadRequest);
+        
         return new Identifier(value);
     }
 
