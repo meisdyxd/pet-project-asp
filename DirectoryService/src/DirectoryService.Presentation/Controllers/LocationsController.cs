@@ -15,7 +15,6 @@ public class LocationsController : MainController
         CancellationToken cancellationToken)
     {
         var command = request.ToCommand();
-        
         var result = await handler.Handle(command, cancellationToken);
         if(result.IsFailure)
             return result.Error.ToResponse();

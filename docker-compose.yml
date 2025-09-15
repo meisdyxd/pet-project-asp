@@ -15,6 +15,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  seq:
+    image: datalust/seq:latest
+    container_name: pet_project_seq
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORD=secure
+    ports:
+      - "5341:80"
+      - "5342:5341"
 
 volumes:
   directory_service_pgdata:

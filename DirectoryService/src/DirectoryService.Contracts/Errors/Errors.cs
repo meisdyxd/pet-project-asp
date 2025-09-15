@@ -2,6 +2,11 @@
 
 public static class Errors
 {
+    public static class Http
+    {
+        public static Error InternalServerError()
+            => new Error("Internal server error", "internal.exception");
+    }
     public static class InvalidValue
     {
         public static Error Default(string name) 
