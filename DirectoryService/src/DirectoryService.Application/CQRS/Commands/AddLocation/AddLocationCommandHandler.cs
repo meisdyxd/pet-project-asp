@@ -34,29 +34,6 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
         if (!resultValidation.IsValid)
             return resultValidation.ToErrorList();
         
-        /*
-        var name = Name.Create(command.Name);
-        if (name.IsFailure)
-            return name.Error;
-        
-        var address = Address.Create(
-            command.Address.Country,
-            command.Address.Region,
-            command.Address.City,
-            command.Address.Street,
-            command.Address.HouseNumber,
-            command.Address.PostalCode,
-            command.Address.District,
-            command.Address.Building,
-            command.Address.Apartment);
-        
-        if (address.IsFailure)
-            return Errors.InvalidValue.Default("address").ToErrorList();
-        
-        var timezone = IANATimezone.Create(command.Timezone);
-        if (timezone.IsFailure)
-            return Errors.InvalidValue.Default("timezone").ToErrorList();
-        */
         var name = Name.Create(command.Name).Value;
         var address = Address.Create(
             command.Address.Country,
