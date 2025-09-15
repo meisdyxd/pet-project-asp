@@ -6,6 +6,9 @@ public static class Errors
     {
         public static Error InternalServerError()
             => new Error("Internal server error", "internal.exception");
+        
+        public static Error BadRequestError(string message, string code) 
+            => new Error(message, code);
     }
     public static class InvalidValue
     {

@@ -1,6 +1,8 @@
 ﻿using DirectoryService.Application;
+using DirectoryService.Application.Interfaces;
 using DirectoryService.Presentation.RegisterServices;
 using DirectoryService.Infrastructure;
+using DirectoryService.Infrastructure.Database.Dapper;
 using DirectoryService.Presentation;
 using DirectoryService.Presentation.Middlewares;
 using Serilog;
@@ -16,6 +18,7 @@ services
     .AddApplication()
     .ConfigureSerilog(configuration)
     .AddScoped<CustomExceptionMiddleware>()
+    .AddSingleton<IDapperConnectionFactory, DapperConnectionFactory>()
     .AddControllers();
 
 var app = builder.Build();

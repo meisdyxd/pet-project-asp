@@ -21,6 +21,7 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                 .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("DirectoryService.Domain.Department", b =>
@@ -28,7 +29,8 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -46,14 +48,15 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                         .HasDefaultValue(true)
                         .HasColumnName("is_active");
 
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_id");
+
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("now()");
-
-                    b.Property<Guid?>("parent_id")
-                        .HasColumnType("uuid");
 
                     b.ComplexProperty<Dictionary<string, object>>("Identifier", "DirectoryService.Domain.Department.Identifier#Identifier", b1 =>
                         {
@@ -89,7 +92,7 @@ namespace DirectoryService.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("parent_id");
+                    b.HasIndex("ParentId");
 
                     b.ToTable("departments", (string)null);
                 });
@@ -133,7 +136,8 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -184,7 +188,8 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -235,7 +240,7 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                 {
                     b.HasOne("DirectoryService.Domain.Department", "Parent")
                         .WithMany("ChildrenDepartments")
-                        .HasForeignKey("parent_id");
+                        .HasForeignKey("ParentId");
 
                     b.Navigation("Parent");
                 });
@@ -283,6 +288,7 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                     b.OwnsOne("DirectoryService.Domain.ValueObjects.Common.Address", "Address", b1 =>
                         {
                             b1.Property<Guid>("LocationId")
+                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
 
                             b1.Property<string>("Apartment")

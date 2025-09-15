@@ -14,7 +14,8 @@ public class LocationConfiguration: IEntityTypeConfiguration<Location>
         builder.HasKey(l => l.Id);
 
         builder.Property(l => l.Id)
-            .HasColumnName("id");
+            .HasColumnName("id")
+            .HasDefaultValueSql("uuid_generate_v4()");
 
         builder.ComplexProperty(l => l.Name, np =>
         {

@@ -18,6 +18,7 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
     public Path Path { get; private set; }
     public short Depth { get; private set; }
     public bool IsActive { get; private set; }
+    public Guid? ParentId { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
@@ -32,11 +33,12 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
         Identifier identifier,
         Path path,
         short depth, 
-        Department? parent = null)
+        Guid? parent = null)
     {
+        Id = Guid.NewGuid();
         Name = name;
         Identifier = identifier;
-        Parent = parent;
+        ParentId = parent;
         Path = path;
         Depth = depth;
         IsActive = Constants.CommonConstants.IS_ACTIVE_DEFAULT;
@@ -49,7 +51,7 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
         Identifier identifier,
         Path path,
         short depth,
-        Department? parent = null)
+        Guid? parent = null)
     {
         return new Department(
             name, 
@@ -57,5 +59,12 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
             path, 
             depth, 
             parent);
+    }
+
+    public void AddLocations(IEnumerable<Guid> locations)
+    {
+        var departmentLocations = locations
+            .Select(l => DepartmentLocation.Create(l, Id).Value);
+        _departmentLocations.AddRange(departmentLocations);
     }
 }

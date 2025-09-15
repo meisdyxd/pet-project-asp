@@ -13,7 +13,9 @@ public class DepartmentConfiguration: IEntityTypeConfiguration<Department>
 
         builder.HasKey(d => d.Id);
 
-        builder.Property(d => d.Id).HasColumnName("id");
+        builder.Property(d => d.Id)
+            .HasColumnName("id")
+            .HasDefaultValueSql("uuid_generate_v4()");
 
         builder.ComplexProperty(d => d.Name, np =>
         {
@@ -46,6 +48,10 @@ public class DepartmentConfiguration: IEntityTypeConfiguration<Department>
             .HasColumnName("is_active")
             .HasDefaultValue(Constants.CommonConstants.IS_ACTIVE_DEFAULT)
             .IsRequired();
+
+        builder.Property(d => d.ParentId)
+            .HasColumnName("parent_id")
+            .IsRequired(false);
         
         builder.Property(d => d.CreatedAt)
             .HasColumnName("created_at")
@@ -59,6 +65,6 @@ public class DepartmentConfiguration: IEntityTypeConfiguration<Department>
 
         builder.HasMany(d => d.ChildrenDepartments)
             .WithOne(cd => cd.Parent)
-            .HasForeignKey("parent_id");
+            .HasForeignKey(d => d.ParentId);
     }
 }

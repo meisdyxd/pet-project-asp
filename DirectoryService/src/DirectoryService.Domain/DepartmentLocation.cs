@@ -26,6 +26,7 @@ public class DepartmentLocation
         
         if (locationId == Guid.Empty)
             errors.Add(Errors.InvalidValue.Default(nameof(locationId)));
+        
         if (departmentId == Guid.Empty)
             errors.Add(Errors.InvalidValue.Default(nameof(departmentId)));
 

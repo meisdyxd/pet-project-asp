@@ -59,7 +59,7 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
             return result.Error.ToErrorList();
         }
 
-        _logger.LogInformation("Location with ID {ID} was successfully added.", location.Value.Id);
+        _logger.LogInformation("Location with ID '{ID}' was successfully added.", location.Value.Id);
         return UnitResult.Success<ErrorList>();
     }
 }
