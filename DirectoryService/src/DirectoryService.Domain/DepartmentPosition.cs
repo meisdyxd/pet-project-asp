@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Net;
+using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
 
 namespace DirectoryService.Domain;
@@ -19,12 +20,17 @@ public class DepartmentPosition
     public Department Department { get; private set; }
     public Position Position { get; private set; }
     
-    public static Result<DepartmentPosition, Error> Create(Guid positionId, Guid departmentId)
+    public static Result<DepartmentPosition, ErrorList> Create(Guid positionId, Guid departmentId)
     {
+        var errors = new List<Error>();
+        
         if (positionId == Guid.Empty)
-            return Errors.InvalidValue.Default(nameof(positionId));
+            errors.Add(Errors.InvalidValue.Default(nameof(positionId)));
         if (departmentId == Guid.Empty)
-            return Errors.InvalidValue.Default(nameof(departmentId));
+            errors.Add(Errors.InvalidValue.Default(nameof(departmentId)));
+        
+        if (errors.Count != 0)
+            return new ErrorList(errors, HttpStatusCode.BadRequest);
         
         return new DepartmentPosition(positionId, departmentId);
     }

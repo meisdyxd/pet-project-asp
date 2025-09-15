@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Net;
+using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
 
 namespace DirectoryService.Domain.ValueObjects.Position;
@@ -12,19 +13,24 @@ public class Name : ValueObject
         Value = value;
     }
 
-    public static Result<Name, Error> Create(string value)
+    public static Result<Name, ErrorList> Create(string value)
     {
+        var errors = new List<Error>();
+        
         if (string.IsNullOrWhiteSpace(value))
-            return Errors.InvalidValue.Empty(nameof(Name).ToLower());
+            errors.Add(Errors.InvalidValue.Empty(nameof(Name).ToLower()));
 
         if (value.Length
             is < Constants.PositionConstants.MIN_LENGTH_NAME
             or > Constants.PositionConstants.MAX_LENGTH_NAME)
-            return Errors.InvalidValue.IncorrectLength(
+            errors.Add(Errors.InvalidValue.IncorrectLength(
                 nameof(Name).ToLower(),
                 Constants.PositionConstants.MIN_LENGTH_NAME,
-                Constants.PositionConstants.MAX_LENGTH_NAME);
+                Constants.PositionConstants.MAX_LENGTH_NAME));
 
+        if (errors.Count != 0)
+            return new ErrorList(errors, HttpStatusCode.BadRequest);
+        
         return new Name(value);
     }
 

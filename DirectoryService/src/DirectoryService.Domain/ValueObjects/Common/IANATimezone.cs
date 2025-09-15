@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Net;
+using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
 using System.Text.RegularExpressions;
 
@@ -13,14 +14,19 @@ public class IANATimezone : ValueObject
         Value = value;
     }
 
-    public static Result<IANATimezone, Error> Create(string value)
+    public static Result<IANATimezone, ErrorList> Create(string value)
     {
+        var errors = new List<Error>();
+        
         if (string.IsNullOrWhiteSpace(value))
-            return Errors.InvalidValue.Empty(nameof(IANATimezone).ToLower());
+            errors.Add(Errors.InvalidValue.Empty(nameof(IANATimezone).ToLower()));
 
         if (!Regex.IsMatch(value, Constants.CommonConstants.REGEX_IANA))
-            return Errors.InvalidValue.Default(nameof(IANATimezone).ToLower());
-
+            errors.Add(Errors.InvalidValue.Default(nameof(IANATimezone).ToLower()));
+        
+        if (errors.Count != 0)
+            return new ErrorList(errors, HttpStatusCode.BadRequest);
+        
         return new IANATimezone(value);
     }
 

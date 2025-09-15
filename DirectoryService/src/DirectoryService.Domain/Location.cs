@@ -33,7 +33,7 @@ public class Location: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public static Result<Location, Error> Create(
+    public static Result<Location, ErrorList> Create(
         Name name, 
         Address address, 
         IANATimezone timezone)
