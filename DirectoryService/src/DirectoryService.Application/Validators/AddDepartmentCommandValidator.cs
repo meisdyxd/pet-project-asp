@@ -30,6 +30,7 @@ public class AddDepartmentCommandValidator : AbstractValidator<AddDepartmentComm
             
         RuleFor(r => r.ParentId)
             .NotEmpty()
-            .WithError("parentId", "parentId are required");
+            .WithError("parentId", "parentId are required")
+            .When(r => r.ParentId != null);
     }
 }

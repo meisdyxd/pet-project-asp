@@ -7,7 +7,7 @@ public static class Constants
         public const int MAX_LENGTH_NAME = 150;
         public const int MAX_LENGTH_IDENTIFIER = 150;
         public const int MIN_LENGTH_NAME = 3;
-        public const int MIN_LENGTH_IDENTIFIER = 3;
+        public const int MIN_LENGTH_IDENTIFIER = 2;
         public const string REGEX_PATH = "^[a-z0-9_-]+(\\.[a-z0-9_-]+)*$";
         public const int MIN_DEPTH = 0;
     }

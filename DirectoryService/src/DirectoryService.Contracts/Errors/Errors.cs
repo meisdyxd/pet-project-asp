@@ -9,6 +9,9 @@ public static class Errors
         
         public static Error BadRequestError(string message, string code) 
             => new Error(message, code);
+        
+        public static Error Conflict(string message, string code) 
+            => new Error(message, code);
     }
     public static class InvalidValue
     {

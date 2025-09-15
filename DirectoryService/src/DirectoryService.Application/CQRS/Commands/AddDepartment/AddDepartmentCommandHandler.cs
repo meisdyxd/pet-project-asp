@@ -69,11 +69,18 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         var name = Name.Create(command.Name).Value;
         
         var identifier = Identifier.Create(command.Identifier).Value;
-        
-        var separator = parentPath == string.Empty ? string.Empty : ".";
+        string separator = parentPath == string.Empty ? string.Empty : ".";
         var path = Path.Create($"{parentPath}{separator}{identifier.Value}").Value;
         
-        var depth = (short)path.Value.Count(p => p == '.');
+        const string pathQuery = "SELECT COUNT(*) FROM departments WHERE parent_id = @parentId AND path = @path";
+        var pathParameters = new DynamicParameters();
+        pathParameters.Add("parentId", command.ParentId);
+        pathParameters.Add("path", path.Value);
+        int pathQueries = await connection.QuerySingleOrDefaultAsync<int>(pathQuery, pathParameters);
+        if (pathQueries > 0)
+            return Errors.Http.Conflict("Department is already exists", "conflict").ToErrorList();
+        
+        short depth = (short)path.Value.Count(p => p == '.');
         
         var department = Department.Create(
             name, 
