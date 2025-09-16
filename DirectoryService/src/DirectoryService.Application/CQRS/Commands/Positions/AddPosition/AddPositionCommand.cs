@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Application.Interfaces.CQRS;
-using DirectoryService.Contracts.Requests;
+using DirectoryService.Contracts.Requests.PositionRequests;
 
-namespace DirectoryService.Application.CQRS.Commands.AddPosition;
+namespace DirectoryService.Application.CQRS.Commands.Positions.AddPosition;
 
 public class AddPositionCommand(AddPositionRequest request) : ICommand
 {

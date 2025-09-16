@@ -1,5 +1,6 @@
-﻿using DirectoryService.Application.CQRS.Commands.AddLocation;
+﻿using DirectoryService.Application.CQRS.Commands.Locations.AddLocation;
 using DirectoryService.Contracts.Requests;
+using DirectoryService.Contracts.Requests.LocationRequests;
 using DirectoryService.Presentation.Extensions;
 using Microsoft.AspNetCore.Mvc;
 

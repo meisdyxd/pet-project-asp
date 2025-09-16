@@ -1,11 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
 using DirectoryService.Application.Extensions;
-using DirectoryService.Application.Interfaces;
 using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Application.Interfaces.Database;
 using DirectoryService.Application.Interfaces.Database.IRepositories;
-using DirectoryService.Contracts;
 using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
@@ -13,7 +11,7 @@ using DirectoryService.Domain.ValueObjects.Position;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 
-namespace DirectoryService.Application.CQRS.Commands.AddPosition;
+namespace DirectoryService.Application.CQRS.Commands.Positions.AddPosition;
 
 public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
 {

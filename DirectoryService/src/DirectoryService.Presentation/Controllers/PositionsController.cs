@@ -1,5 +1,6 @@
-﻿using DirectoryService.Application.CQRS.Commands.AddPosition;
+﻿using DirectoryService.Application.CQRS.Commands.Positions.AddPosition;
 using DirectoryService.Contracts.Requests;
+using DirectoryService.Contracts.Requests.PositionRequests;
 using DirectoryService.Presentation.Extensions;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,9 +1,9 @@
-﻿using DirectoryService.Application.CQRS.Commands.AddPosition;
+﻿using DirectoryService.Application.CQRS.Commands.Positions.AddPosition;
 using DirectoryService.Application.Extensions;
 using DirectoryService.Domain.ValueObjects.Position;
 using FluentValidation;
 
-namespace DirectoryService.Application.Validators;
+namespace DirectoryService.Application.Validators.PositionsValidators;
 
 public class AddPositionCommandValidator : AbstractValidator<AddPositionCommand>
 {

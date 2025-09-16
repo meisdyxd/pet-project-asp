@@ -1,8 +1,7 @@
 ﻿using DirectoryService.Application.Interfaces.CQRS;
-using DirectoryService.Contracts;
-using DirectoryService.Contracts.Requests;
+using DirectoryService.Contracts.Requests.LocationRequests;
 
-namespace DirectoryService.Application.CQRS.Commands.AddLocation;
+namespace DirectoryService.Application.CQRS.Commands.Locations.AddLocation;
 
 public class AddLocationCommand(AddLocationRequest request) : ICommand
 {

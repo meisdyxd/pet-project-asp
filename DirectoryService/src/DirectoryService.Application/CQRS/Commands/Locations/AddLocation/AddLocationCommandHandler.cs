@@ -1,10 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Extensions;
-using DirectoryService.Application.Interfaces;
 using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Application.Interfaces.Database;
 using DirectoryService.Application.Interfaces.Database.IRepositories;
-using DirectoryService.Contracts;
 using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
@@ -13,7 +11,7 @@ using DirectoryService.Domain.ValueObjects.Location;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 
-namespace DirectoryService.Application.CQRS.Commands.AddLocation;
+namespace DirectoryService.Application.CQRS.Commands.Locations.AddLocation;
 
 public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
 {
