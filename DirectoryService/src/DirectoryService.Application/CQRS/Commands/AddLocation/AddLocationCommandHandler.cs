@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Extensions;
+using DirectoryService.Application.Interfaces;
 using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Application.Interfaces.IRepositories;
 using DirectoryService.Contracts;
@@ -15,15 +16,18 @@ namespace DirectoryService.Application.CQRS.Commands.AddLocation;
 public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
 {
     private readonly ILocationsRepository _locationsRepository;
+    private readonly ITransactionManager _transactionManager;
     private readonly ILogger<AddLocationCommandHandler> _logger;
     private readonly IValidator<AddLocationCommand>  _validator;
     
     public AddLocationCommandHandler(
         ILocationsRepository locationsRepository, 
+        ITransactionManager transactionManager,
         IValidator<AddLocationCommand> validator,
         ILogger<AddLocationCommandHandler> logger)
     {
         _locationsRepository = locationsRepository;
+        _transactionManager = transactionManager;
         _validator = validator;
         _logger = logger;
     }
@@ -52,12 +56,9 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
             return Errors.InvalidValue.Default("location").ToErrorList();
         
         await _locationsRepository.AddAsync(location.Value, cancellationToken);
-        var result = await _locationsRepository.SaveChangesAsync(cancellationToken);
+        var result = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (result.IsFailure)
-        {
-            _logger.LogError("Error when save location to DB");
-            return result.Error.ToErrorList();
-        }
+            return result.Error;
 
         _logger.LogInformation("Location with ID '{ID}' was successfully added.", location.Value.Id);
         return UnitResult.Success<ErrorList>();

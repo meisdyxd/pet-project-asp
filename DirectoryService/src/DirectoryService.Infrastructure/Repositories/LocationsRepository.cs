@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Interfaces.IRepositories;
-using DirectoryService.Contracts;
+﻿using DirectoryService.Application.Interfaces.IRepositories;
 using DirectoryService.Domain;
 using DirectoryService.Infrastructure.Database.Context;
 using Microsoft.EntityFrameworkCore;
@@ -21,16 +19,13 @@ public class LocationsRepository : ILocationsRepository
         await _context.AddAsync(location, cancellationToken);
     }
 
-    public async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
+    public async Task<bool> ExistLocationsAsync(Guid[] locationIds, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _context.SaveChangesAsync(cancellationToken);
-            return UnitResult.Success<Error>();
-        }
-        catch(Exception ex)
-        {
-            return Errors.DbErrors.WhenSave(ex.Message);
-        }
+        var locationCount = await _context.Locations
+            .AsNoTracking()
+            .Where(l => locationIds.Contains(l.Id))
+            .CountAsync(cancellationToken);
+
+        return locationCount == locationIds.Length;
     }
 }

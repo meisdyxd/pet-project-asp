@@ -1,8 +1,8 @@
-﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Interfaces.IRepositories;
-using DirectoryService.Contracts;
+﻿using DirectoryService.Application.Interfaces.IRepositories;
 using DirectoryService.Domain;
+using DirectoryService.Domain.ValueObjects.Position;
 using DirectoryService.Infrastructure.Database.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.Infrastructure.Repositories;
 
@@ -19,17 +19,14 @@ public class PositionsRepository : IPositionsRepository
     {
         await _context.AddAsync(position, cancellationToken);
     }
-    
-    public async Task<UnitResult<Error>> SaveChangesAsync(CancellationToken cancellationToken)
+
+    public async Task<Position?> GetActiveByNameAsync(Name name, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _context.SaveChangesAsync(cancellationToken);
-            return UnitResult.Success<Error>();
-        }
-        catch(Exception ex)
-        {
-            return Errors.DbErrors.WhenSave(ex.Message);
-        }
+        var uniqueWhereActive = await _context.PositionsRead
+            .AsNoTracking()
+            .Where(p => p.IsActive)
+            .FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
+
+        return uniqueWhereActive;
     }
 }

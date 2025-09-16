@@ -8,7 +8,6 @@ using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Department;
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
@@ -18,19 +17,19 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
 {
     private readonly ILogger<AddDepartmentCommandHandler> _logger;
     private readonly IDepartmentsRepository _departmentsRepository;
+    private readonly ILocationsRepository _locationsRepository;
     private readonly ITransactionManager _transactionManager;
     private readonly IValidator<AddDepartmentCommand> _validator;
-    private readonly IReadDbContext _readDbContext;
 
     public AddDepartmentCommandHandler(
         IDepartmentsRepository departmentsRepository,
-        IReadDbContext readDbContext,
+        ILocationsRepository locationsRepository,
         ITransactionManager transactionManager,
         IValidator<AddDepartmentCommand> validator,
         ILogger<AddDepartmentCommandHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
-        _readDbContext = readDbContext;
+        _locationsRepository = locationsRepository;
         _transactionManager = transactionManager;
         _validator = validator;
         _logger = logger;
@@ -50,47 +49,29 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         using var transaction = transactionResult.Value;
         
         var locationIds = (command.LocationIds ?? []).ToArray();
-        var locationCount = await _readDbContext.LocationsRead
-            .Where(l => locationIds.Contains(l.Id))
-            .CountAsync(cancellationToken);
-
-        if (locationCount != locationIds.Length)
+        var existLocations = await _locationsRepository.ExistLocationsAsync(locationIds, cancellationToken);
+        if (!existLocations)
         {
             transaction.Rollback();
             return Errors.Http.BadRequestError("Locations not found", "http.not.found").ToErrorList();
         }
-            
         
         var name = Name.Create(command.Name).Value;
         var identifier = Identifier.Create(command.Identifier).Value;
         
         string parentPath = string.Empty;
-        if (command.ParentId is not null)
+        if (command.ParentId != null)
         {
-            var parentDepartment = await _readDbContext.DepartmentsRead
-                .Where(d => d.Id == command.ParentId)
-                .Select(d => new
-                {
-                    d.Path,
-                    IsUniqueIdentifier = d.ChildrenDepartments.All(cd => cd.Identifier.Value != identifier.Value)
-                })
-                .FirstOrDefaultAsync(cancellationToken);
+            var pathResult = await _departmentsRepository.GetParentPathAsync(command.ParentId.Value, command.Identifier, cancellationToken);
+            if (pathResult.IsFailure)
+            {
+                transaction.Rollback();
+                return pathResult.Error.ToErrorList();
+            }
 
-            if (parentDepartment is null)
-            {
-                transaction.Rollback();
-                return Errors.Http.BadRequestError("Parent path not found", "http.not.found").ToErrorList();
-            }
-            
-            if (!parentDepartment.IsUniqueIdentifier)
-            {
-                transaction.Rollback();
-                return Errors.Http.Conflict("Department identifier must be unique", "http.conflict").ToErrorList();
-            }
-            
-            parentPath = parentDepartment.Path.Value;
+            parentPath = pathResult.Value;
         }
-        
+
         string separator = parentPath == string.Empty ? string.Empty : ".";
         var path = Path.Create($"{parentPath}{separator}{identifier.Value}").Value;
         short depth = (short)path.Value.Count(p => p == '.');
@@ -117,16 +98,12 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         if (resultSave.IsFailure)
         {
             transaction.Rollback();
-            _logger.LogError("Error when saving department to DB: {Error}", resultSave.Error);
             return resultSave.Error;
         }
 
         var transactionCommit = transaction.Commit();
         if (transactionCommit.IsFailure)
-        {
-            _logger.LogInformation("Commit transaction failed while add department");
             return transactionCommit.Error;
-        }
         
         _logger.LogInformation("Department with ID '{ID}' was successfully created", departmentValue.Id);
         return UnitResult.Success<ErrorList>();

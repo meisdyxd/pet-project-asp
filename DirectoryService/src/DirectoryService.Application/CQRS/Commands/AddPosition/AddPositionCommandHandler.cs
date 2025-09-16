@@ -9,7 +9,6 @@ using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Position;
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.CQRS.Commands.AddPosition;
@@ -18,20 +17,20 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
 {
     private readonly ILogger<AddDepartmentCommandHandler> _logger;
     private readonly IPositionsRepository _positionsRepository;
+    private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ITransactionManager _transactionManager;
-    private readonly IReadDbContext _context;
     private readonly IValidator<AddPositionCommand> _validator;
 
     public AddPositionCommandHandler(
         IPositionsRepository positionsRepository,
+        IDepartmentsRepository departmentsRepository,
         IValidator<AddPositionCommand> validator,
-        IReadDbContext context,
         ITransactionManager transactionManager,
         ILogger<AddDepartmentCommandHandler> logger)
     {
         _positionsRepository = positionsRepository;
+        _departmentsRepository = departmentsRepository;
         _transactionManager = transactionManager;
-        _context = context;
         _validator = validator;
         _logger = logger;
     }
@@ -51,26 +50,17 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         if (transactionResult.IsFailure)
             return Errors.DbErrors.BeginTransaction().ToErrorList();
         using var transaction = transactionResult.Value;
-        
-        var uniqueWhereActive = await _context.PositionsRead
-            .Where(p => p.IsActive)
-            .FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
 
-        if (uniqueWhereActive != null)
+        var activePosition = await _positionsRepository.GetActiveByNameAsync(name, cancellationToken);
+
+        if (activePosition != null)
         {
             transaction.Rollback();
             return Errors.Http.Conflict("Active position already exists", "http.conflict").ToErrorList();
         }
         
-        var existingCount = await _context.DepartmentsRead
-            .Where(d => d.IsActive && command.DepartmentIds.Contains(d.Id))
-            .CountAsync(cancellationToken);
-        
-        if (existingCount != command.DepartmentIds.Count())
-        {
-            transaction.Rollback();
-            return Errors.Http.BadRequestError("Undefined departments", "http.not.found").ToErrorList();
-        }
+        var existActiveDepartmentsResult = await _departmentsRepository
+            .ExistActiveDepartmentsAsync([.. command.DepartmentIds], cancellationToken);
 
         var position = Position.Create(name, description);
         if (position.IsFailure)
@@ -89,16 +79,12 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         if (resultSave.IsFailure)
         {
             transaction.Rollback();
-            _logger.LogError("Error when saving department to DB: {Error}", resultSave.Error);
             return resultSave.Error;
         }
         
         var transactionCommit = transaction.Commit();
         if (transactionCommit.IsFailure)
-        {
-            _logger.LogInformation("Commit transaction failed while add department");
             return transactionCommit.Error;
-        }
         
         return UnitResult.Success<ErrorList>();
     }
