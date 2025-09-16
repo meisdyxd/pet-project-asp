@@ -68,4 +68,10 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
             .Select(l => DepartmentLocation.Create(l, Id).Value);
         _departmentLocations.AddRange(departmentLocations);
     }
+
+    public void UpdateLocations(IEnumerable<Guid> locations)
+    {
+        _departmentLocations.Clear();
+        AddLocations(locations);
+    }
 }

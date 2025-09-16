@@ -57,6 +57,8 @@ public class DepartmentsRepository : IDepartmentsRepository
 
     public async Task<Department?> GetByIdAsync(Guid departmentId, CancellationToken cancellationToken)
     {
-        return await _context.Departments.FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken);
+        return await _context.Departments
+            .Include(d => d.DepartmentLocations)
+            .FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken);
     }
 }

@@ -6,6 +6,6 @@ namespace DirectoryService.Application.CQRS.Commands.Departments.UpdateLocations
 
 public class UpdateLocationsCommand(Guid departmentId, UpdateLocationsRequest request) : ICommand
 {
-    public Guid DepartmentId { get; set; }
+    public Guid DepartmentId { get; set; } = departmentId;
     public UpdateLocationsRequest Request { get; set; } = request;
 }
