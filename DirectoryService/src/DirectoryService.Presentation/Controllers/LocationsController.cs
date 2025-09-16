@@ -1,6 +1,6 @@
 ﻿using DirectoryService.Application.CQRS.Commands.AddLocation;
+using DirectoryService.Contracts.Requests;
 using DirectoryService.Presentation.Extensions;
-using DirectoryService.Presentation.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.Presentation.Controllers;
@@ -14,7 +14,7 @@ public class LocationsController : MainController
         [FromServices] AddLocationCommandHandler handler,
         CancellationToken cancellationToken)
     {
-        var command = request.ToCommand();
+        var command = new AddLocationCommand(request);
         var result = await handler.Handle(command, cancellationToken);
         if(result.IsFailure)
             return result.Error.ToResponse();

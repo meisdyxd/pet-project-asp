@@ -1,20 +1,20 @@
-﻿using DirectoryService.Application.CQRS.Commands.AddDepartment;
+﻿using DirectoryService.Application.CQRS.Commands.AddPosition;
 using DirectoryService.Contracts.Requests;
 using DirectoryService.Presentation.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.Presentation.Controllers;
 
-[Route("api/departments")]
-public class DepartmentsController : MainController
+[Route("api/positions")]
+public class PositionsController : MainController
 {
     [HttpPost]
     public async Task<IActionResult> Add(
-        [FromServices] AddDepartmentCommandHandler handler,
-        [FromBody] AddDepartmentRequest request,
+        [FromServices] AddPositionCommandHandler handler,
+        [FromBody] AddPositionRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new AddDepartmentCommand(request);
+        var command = new AddPositionCommand(request);
         var result = await handler.Handle(command, cancellationToken);
         if(result.IsFailure)
             return result.Error.ToResponse();

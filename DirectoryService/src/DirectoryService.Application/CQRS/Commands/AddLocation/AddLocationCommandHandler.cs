@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Extensions;
+using DirectoryService.Application.Interfaces;
 using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Application.Interfaces.IRepositories;
 using DirectoryService.Contracts;
@@ -15,15 +16,18 @@ namespace DirectoryService.Application.CQRS.Commands.AddLocation;
 public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
 {
     private readonly ILocationsRepository _locationsRepository;
+    private readonly ITransactionManager _transactionManager;
     private readonly ILogger<AddLocationCommandHandler> _logger;
     private readonly IValidator<AddLocationCommand>  _validator;
     
     public AddLocationCommandHandler(
         ILocationsRepository locationsRepository, 
+        ITransactionManager transactionManager,
         IValidator<AddLocationCommand> validator,
         ILogger<AddLocationCommandHandler> logger)
     {
         _locationsRepository = locationsRepository;
+        _transactionManager = transactionManager;
         _validator = validator;
         _logger = logger;
     }
@@ -34,30 +38,28 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
         if (!resultValidation.IsValid)
             return resultValidation.ToErrorList();
         
-        var name = Name.Create(command.Name).Value;
+        var name = Name.Create(command.Request.Name).Value;
+        var addressDto = command.Request.Address;
         var address = Address.Create(
-            command.Address.Country,
-            command.Address.Region,
-            command.Address.City,
-            command.Address.Street,
-            command.Address.HouseNumber,
-            command.Address.PostalCode,
-            command.Address.District,
-            command.Address.Building,
-            command.Address.Apartment).Value;
-        var timezone = IANATimezone.Create(command.Timezone).Value;
+            addressDto.Country,
+            addressDto.Region,
+            addressDto.City,
+            addressDto.Street,
+            addressDto.HouseNumber,
+            addressDto.PostalCode,
+            addressDto.District,
+            addressDto.Building,
+            addressDto.Apartment).Value;
+        var timezone = IANATimezone.Create(command.Request.Timezone).Value;
         
         var location = Location.Create(name, address, timezone);
         if (location.IsFailure) 
             return Errors.InvalidValue.Default("location").ToErrorList();
         
         await _locationsRepository.AddAsync(location.Value, cancellationToken);
-        var result = await _locationsRepository.SaveChangesAsync(cancellationToken);
+        var result = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (result.IsFailure)
-        {
-            _logger.LogError("Error when save location to DB");
-            return result.Error.ToErrorList();
-        }
+            return result.Error;
 
         _logger.LogInformation("Location with ID '{ID}' was successfully added.", location.Value.Id);
         return UnitResult.Success<ErrorList>();
