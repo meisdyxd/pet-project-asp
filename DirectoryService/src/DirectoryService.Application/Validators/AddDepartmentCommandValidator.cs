@@ -9,13 +9,13 @@ public class AddDepartmentCommandValidator : AbstractValidator<AddDepartmentComm
 {
     public AddDepartmentCommandValidator()
     {
-        RuleFor(r => r.Name)
+        RuleFor(r => r.Request.Name)
             .MustBeValueObject(Name.Create);
         
-        RuleFor(r => r.Identifier)
+        RuleFor(r => r.Request.Identifier)
             .MustBeValueObject(Identifier.Create);
         
-        RuleFor(r => r.LocationIds)
+        RuleFor(r => r.Request.LocationIds)
             .Must(l => l.Any())
             .WithError("locationIds", "LocationIds cannot be empty")
             .Must(l =>
@@ -24,13 +24,13 @@ public class AddDepartmentCommandValidator : AbstractValidator<AddDepartmentComm
                 return enumerable.Count == enumerable.Distinct().Count();
             });
         
-        RuleForEach(r => r.LocationIds)
+        RuleForEach(r => r.Request.LocationIds)
             .NotEmpty()
             .WithError("locationIds", "locationIds are required");
             
-        RuleFor(r => r.ParentId)
+        RuleFor(r => r.Request.ParentId)
             .NotEmpty()
             .WithError("parentId", "parentId are required")
-            .When(r => r.ParentId != null);
+            .When(r => r.Request.ParentId != null);
     }
 }

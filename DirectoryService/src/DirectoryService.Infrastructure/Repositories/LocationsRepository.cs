@@ -22,7 +22,6 @@ public class LocationsRepository : ILocationsRepository
     public async Task<bool> ExistLocationsAsync(Guid[] locationIds, CancellationToken cancellationToken)
     {
         var locationCount = await _context.Locations
-            .AsNoTracking()
             .Where(l => locationIds.Contains(l.Id))
             .CountAsync(cancellationToken);
 

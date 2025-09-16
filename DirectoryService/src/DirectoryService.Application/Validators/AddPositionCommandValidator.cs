@@ -9,13 +9,13 @@ public class AddPositionCommandValidator : AbstractValidator<AddPositionCommand>
 {
     public AddPositionCommandValidator()
     {
-        RuleFor(r => r.Name)
+        RuleFor(r => r.Request.Name)
             .MustBeValueObject(Name.Create);
         
-        RuleFor(r => r.Description)
+        RuleFor(r => r.Request.Description)
             .MustBeValueObject(Description.Create);
         
-        RuleFor(r => r.DepartmentIds)
+        RuleFor(r => r.Request.DepartmentIds)
             .Must(r => r.Any())
             .WithError("departmentIds", "departmentIds cannot be empty")
             .Must(r =>

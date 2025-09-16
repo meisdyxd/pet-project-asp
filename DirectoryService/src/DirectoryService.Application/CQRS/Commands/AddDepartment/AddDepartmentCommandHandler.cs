@@ -48,7 +48,7 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
             return Errors.DbErrors.BeginTransaction().ToErrorList();
         using var transaction = transactionResult.Value;
         
-        var locationIds = (command.LocationIds ?? []).ToArray();
+        var locationIds = (command.Request.LocationIds ?? []).ToArray();
         var existLocations = await _locationsRepository.ExistLocationsAsync(locationIds, cancellationToken);
         if (!existLocations)
         {
@@ -56,19 +56,22 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
             return Errors.Http.BadRequestError("Locations not found", "http.not.found").ToErrorList();
         }
         
-        var name = Name.Create(command.Name).Value;
-        var identifier = Identifier.Create(command.Identifier).Value;
+        var name = Name.Create(command.Request.Name).Value;
+        var identifier = Identifier.Create(command.Request.Identifier).Value;
         
         string parentPath = string.Empty;
-        if (command.ParentId != null)
+        if (command.Request.ParentId != null)
         {
-            var pathResult = await _departmentsRepository.GetParentPathAsync(command.ParentId.Value, command.Identifier, cancellationToken);
+            var pathResult = await _departmentsRepository.GetParentPathAsync(
+                command.Request.ParentId.Value, 
+                command.Request.Identifier, 
+                cancellationToken);
+            
             if (pathResult.IsFailure)
             {
                 transaction.Rollback();
                 return pathResult.Error.ToErrorList();
             }
-
             parentPath = pathResult.Value;
         }
 
@@ -81,7 +84,7 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
             identifier, 
             path, 
             depth, 
-            command.ParentId);
+            command.Request.ParentId);
         
         if (department.IsFailure)
         {

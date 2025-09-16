@@ -22,8 +22,7 @@ public class PositionsRepository : IPositionsRepository
 
     public async Task<Position?> GetActiveByNameAsync(Name name, CancellationToken cancellationToken)
     {
-        var uniqueWhereActive = await _context.PositionsRead
-            .AsNoTracking()
+        var uniqueWhereActive = await _context.Positions
             .Where(p => p.IsActive)
             .FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
 

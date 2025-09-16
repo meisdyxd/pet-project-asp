@@ -24,8 +24,7 @@ public class DepartmentsRepository : IDepartmentsRepository
 
     public async Task<Result<string, Error>> GetParentPathAsync(Guid parentId, string identifier, CancellationToken cancellationToken)
     {
-        var parentDepartment = await _context.DepartmentsRead
-            .AsNoTracking()
+        var parentDepartment = await _context.Departments
             .Where(d => d.Id == parentId)
             .Select(d => new
             {
@@ -45,8 +44,7 @@ public class DepartmentsRepository : IDepartmentsRepository
 
    public async Task<Result<bool, Error>> ExistActiveDepartmentsAsync(Guid[] departmentIds, CancellationToken cancellationToken)
     {
-        var count = await _context.DepartmentsRead
-            .AsNoTracking()
+        var count = await _context.Departments
             .Where(d => d.IsActive && departmentIds.Contains(d.Id))
             .CountAsync(cancellationToken);
 

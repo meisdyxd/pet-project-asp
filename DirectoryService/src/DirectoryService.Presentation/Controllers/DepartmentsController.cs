@@ -1,6 +1,6 @@
 ﻿using DirectoryService.Application.CQRS.Commands.AddDepartment;
+using DirectoryService.Contracts.Requests;
 using DirectoryService.Presentation.Extensions;
-using DirectoryService.Presentation.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.Presentation.Controllers;
@@ -14,7 +14,7 @@ public class DepartmentsController : MainController
         [FromBody] AddDepartmentRequest request,
         CancellationToken cancellationToken)
     {
-        var command = request.ToCommand();
+        var command = new AddDepartmentCommand(request);
         var result = await handler.Handle(command, cancellationToken);
         if(result.IsFailure)
             return result.Error.ToResponse();

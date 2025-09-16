@@ -38,18 +38,19 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
         if (!resultValidation.IsValid)
             return resultValidation.ToErrorList();
         
-        var name = Name.Create(command.Name).Value;
+        var name = Name.Create(command.Request.Name).Value;
+        var addressDto = command.Request.Address;
         var address = Address.Create(
-            command.Address.Country,
-            command.Address.Region,
-            command.Address.City,
-            command.Address.Street,
-            command.Address.HouseNumber,
-            command.Address.PostalCode,
-            command.Address.District,
-            command.Address.Building,
-            command.Address.Apartment).Value;
-        var timezone = IANATimezone.Create(command.Timezone).Value;
+            addressDto.Country,
+            addressDto.Region,
+            addressDto.City,
+            addressDto.Street,
+            addressDto.HouseNumber,
+            addressDto.PostalCode,
+            addressDto.District,
+            addressDto.Building,
+            addressDto.Apartment).Value;
+        var timezone = IANATimezone.Create(command.Request.Timezone).Value;
         
         var location = Location.Create(name, address, timezone);
         if (location.IsFailure) 

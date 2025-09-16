@@ -1,23 +1,9 @@
 ﻿using DirectoryService.Application.Interfaces.CQRS;
+using DirectoryService.Contracts.Requests;
 
 namespace DirectoryService.Application.CQRS.Commands.AddDepartment;
 
-public class AddDepartmentCommand : ICommand
+public class AddDepartmentCommand(AddDepartmentRequest request) : ICommand
 {
-    public string Name { get; init; }
-    public string Identifier { get; init; }
-    public Guid? ParentId { get; init; }
-    public IEnumerable<Guid> LocationIds { get; init; }
-
-    public AddDepartmentCommand(
-        string name,
-        string identifier,
-        Guid? parentId,
-        IEnumerable<Guid> locationIds)
-    {
-        Name = name;
-        Identifier = identifier;
-        ParentId = parentId;
-        LocationIds = locationIds;
-    }
+    public AddDepartmentRequest Request { get; init; } = request;
 }

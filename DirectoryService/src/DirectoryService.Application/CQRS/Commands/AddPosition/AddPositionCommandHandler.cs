@@ -43,8 +43,8 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         if (!validationResult.IsValid)
             return validationResult.ToErrorList();
         
-        var name = Name.Create(command.Name).Value;
-        var description = Description.Create(command.Description).Value;
+        var name = Name.Create(command.Request.Name).Value;
+        var description = Description.Create(command.Request.Description).Value;
         
         var transactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
         if (transactionResult.IsFailure)
@@ -60,7 +60,7 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         }
         
         var existActiveDepartmentsResult = await _departmentsRepository
-            .ExistActiveDepartmentsAsync([.. command.DepartmentIds], cancellationToken);
+            .ExistActiveDepartmentsAsync([.. command.Request.DepartmentIds], cancellationToken);
 
         var position = Position.Create(name, description);
         if (position.IsFailure)
@@ -71,7 +71,7 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         }
         
         var positionValue = position.Value;
-        positionValue.LinkWithDepartments(command.DepartmentIds);
+        positionValue.LinkWithDepartments(command.Request.DepartmentIds);
         
         await _positionsRepository.AddAsync(positionValue, cancellationToken);
         

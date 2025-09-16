@@ -1,21 +1,10 @@
 ﻿using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Requests;
 
 namespace DirectoryService.Application.CQRS.Commands.AddLocation;
 
-public class AddLocationCommand : ICommand
+public class AddLocationCommand(AddLocationRequest request) : ICommand
 {
-    public AddLocationCommand(
-        string name,
-        AddressDto address,
-        string timezone)
-    {
-        Name = name;
-        Address = address;
-        Timezone = timezone;
-    }
-    
-    public string Name { get; init; }
-    public AddressDto Address { get; init; }
-    public string Timezone { get; init; }
+    public AddLocationRequest Request { get; init; } = request;
 }
