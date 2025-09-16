@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Position;
 
-namespace DirectoryService.Application.Interfaces.IRepositories;
+namespace DirectoryService.Application.Interfaces.Database.IRepositories;
 
 public interface IPositionsRepository
 {

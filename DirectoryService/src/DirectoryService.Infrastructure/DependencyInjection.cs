@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Interfaces;
-using DirectoryService.Application.Interfaces.IRepositories;
+using DirectoryService.Application.Interfaces.Database;
+using DirectoryService.Application.Interfaces.Database.IRepositories;
 using DirectoryService.Infrastructure.Database;
 using DirectoryService.Infrastructure.Database.Context;
 using DirectoryService.Infrastructure.Repositories;

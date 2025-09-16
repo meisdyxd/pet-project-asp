@@ -1,5 +1,6 @@
 using System.Net;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Domain;
 using Microsoft.AspNetCore.Mvc;
 

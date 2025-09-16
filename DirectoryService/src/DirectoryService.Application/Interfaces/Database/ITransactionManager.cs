@@ -1,8 +1,7 @@
-﻿using System.Transactions;
-using CSharpFunctionalExtensions;
-using DirectoryService.Contracts;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Contracts.Errors;
 
-namespace DirectoryService.Application.Interfaces;
+namespace DirectoryService.Application.Interfaces.Database;
 
 public interface ITransactionManager
 {

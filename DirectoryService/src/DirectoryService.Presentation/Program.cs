@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application;
 using DirectoryService.Application.Interfaces;
+using DirectoryService.Application.Interfaces.Database;
 using DirectoryService.Presentation.RegisterServices;
 using DirectoryService.Infrastructure;
 using DirectoryService.Infrastructure.Database.Dapper;

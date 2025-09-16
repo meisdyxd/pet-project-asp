@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace DirectoryService.Application.Interfaces;
+namespace DirectoryService.Application.Interfaces.Database;
 
 public interface IDapperConnectionFactory
 {

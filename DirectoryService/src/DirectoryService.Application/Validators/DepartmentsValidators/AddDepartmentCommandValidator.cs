@@ -1,9 +1,9 @@
-﻿using DirectoryService.Application.CQRS.Commands.AddDepartment;
-using DirectoryService.Domain.ValueObjects.Department;
+﻿using DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
 using DirectoryService.Application.Extensions;
+using DirectoryService.Domain.ValueObjects.Department;
 using FluentValidation;
 
-namespace DirectoryService.Application.Validators;
+namespace DirectoryService.Application.Validators.DepartmentsValidators;
 
 public class AddDepartmentCommandValidator : AbstractValidator<AddDepartmentCommand>
 {

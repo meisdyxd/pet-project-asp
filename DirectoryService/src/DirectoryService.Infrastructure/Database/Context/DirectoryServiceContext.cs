@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Application.Interfaces;
+using DirectoryService.Application.Interfaces.Database;
 using DirectoryService.Domain;
 using Microsoft.EntityFrameworkCore;
 

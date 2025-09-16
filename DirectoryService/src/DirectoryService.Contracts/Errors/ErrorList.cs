@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace DirectoryService.Contracts;
+namespace DirectoryService.Contracts.Errors;
 
 public class ErrorList
 {

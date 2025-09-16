@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
 using System.Text.RegularExpressions;
+using DirectoryService.Contracts.Errors;
 
 namespace DirectoryService.Domain.ValueObjects.Department;
 

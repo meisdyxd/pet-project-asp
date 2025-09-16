@@ -1,7 +1,9 @@
 ﻿using System.Data;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Interfaces;
+using DirectoryService.Application.Interfaces.Database;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Extensions;
 using Microsoft.Extensions.Logging;
 

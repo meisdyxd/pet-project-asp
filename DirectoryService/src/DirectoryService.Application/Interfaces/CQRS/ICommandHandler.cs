@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Errors;
 
 namespace DirectoryService.Application.Interfaces.CQRS;
 

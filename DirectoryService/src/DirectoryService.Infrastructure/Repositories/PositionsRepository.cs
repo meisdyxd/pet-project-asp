@@ -1,4 +1,4 @@
-﻿using DirectoryService.Application.Interfaces.IRepositories;
+﻿using DirectoryService.Application.Interfaces.Database.IRepositories;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Position;
 using DirectoryService.Infrastructure.Database.Context;

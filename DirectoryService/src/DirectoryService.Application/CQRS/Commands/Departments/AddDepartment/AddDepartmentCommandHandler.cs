@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Interfaces;
-using DirectoryService.Application.Interfaces.CQRS;
-using DirectoryService.Contracts;
 using DirectoryService.Application.Extensions;
-using DirectoryService.Application.Interfaces.IRepositories;
+using DirectoryService.Application.Interfaces.CQRS;
+using DirectoryService.Application.Interfaces.Database;
+using DirectoryService.Application.Interfaces.Database.IRepositories;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Department;
@@ -11,7 +11,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
-namespace DirectoryService.Application.CQRS.Commands.AddDepartment;
+namespace DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
 
 public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
 {

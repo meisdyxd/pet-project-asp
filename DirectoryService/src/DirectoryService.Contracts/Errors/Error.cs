@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Contracts;
+﻿namespace DirectoryService.Contracts.Errors;
 
 public class Error(
     string message,

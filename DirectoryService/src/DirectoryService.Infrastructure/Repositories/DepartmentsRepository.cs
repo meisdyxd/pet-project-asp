@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Interfaces.IRepositories;
+using DirectoryService.Application.Interfaces.Database.IRepositories;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Domain;
 using DirectoryService.Infrastructure.Database.Context;
 using Microsoft.EntityFrameworkCore;
@@ -52,5 +53,10 @@ public class DepartmentsRepository : IDepartmentsRepository
             return Errors.Http.BadRequestError("Undefined departments", "http.not.found");
 
         return true;
+    }
+
+    public async Task<Department?> GetByIdAsync(Guid departmentId, CancellationToken cancellationToken)
+    {
+        return await _context.Departments.FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken);
     }
 }

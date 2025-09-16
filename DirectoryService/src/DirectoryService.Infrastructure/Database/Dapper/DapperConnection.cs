@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Data;
+using DirectoryService.Application.Interfaces.Database;
 using Npgsql;
 
 namespace DirectoryService.Infrastructure.Database.Dapper;

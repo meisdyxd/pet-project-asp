@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Contracts.Requests;
+﻿namespace DirectoryService.Contracts.Requests.DepartmentRequests;
 
 public class AddDepartmentRequest
 {

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Domain;
 
 namespace DirectoryService.Presentation.Middlewares;

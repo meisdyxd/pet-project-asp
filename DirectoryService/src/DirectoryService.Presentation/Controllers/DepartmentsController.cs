@@ -1,5 +1,7 @@
-﻿using DirectoryService.Application.CQRS.Commands.AddDepartment;
+﻿using DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
+using DirectoryService.Application.CQRS.Commands.Departments.UpdateLocations;
 using DirectoryService.Contracts.Requests;
+using DirectoryService.Contracts.Requests.DepartmentRequests;
 using DirectoryService.Presentation.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,5 +22,20 @@ public class DepartmentsController : MainController
             return result.Error.ToResponse();
         
         return Created();
+    }
+
+    [HttpPut("{departmentId}/locations")]
+    public async Task<IActionResult> UpdateLocation(
+        [FromRoute] Guid departmentId,
+        [FromBody] UpdateLocationsRequest request,
+        [FromServices] UpdateLocationsCommandHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateLocationsCommand(departmentId, request);
+        var result = await handler.Handle(command, cancellationToken);
+        if(result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok();
     }
 }
