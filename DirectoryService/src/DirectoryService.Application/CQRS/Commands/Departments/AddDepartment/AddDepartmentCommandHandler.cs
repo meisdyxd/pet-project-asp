@@ -40,27 +40,30 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         AddDepartmentCommand command, 
         CancellationToken cancellationToken)
     {
+        //Валидация входных данных
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
             return validationResult.ToErrorList();
         
+        //Транзакция
         var transactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
         if (transactionResult.IsFailure)
             return Errors.DbErrors.BeginTransaction().ToErrorList();
         using var transaction = transactionResult.Value;
         
+        //Проверка существованяи локаций
         var locationIds = (command.Request.LocationIds ?? []).ToArray();
         var existLocations = await _locationsRepository.ExistLocationsAsync(locationIds, cancellationToken);
         if (!existLocations)
         {
             transaction.Rollback();
-            return Errors.Http.BadRequestError("Locations not found", "http.unprocessable.content")
-                .ToErrorList((int)HttpStatusCode.UnprocessableContent);
+            return Errors.Http.UnprocessableContent("Not all locations found");
         }
         
         var name = Name.Create(command.Request.Name).Value;
         var identifier = Identifier.Create(command.Request.Identifier).Value;
         
+        //Получение родительского пути, для построения нового
         string? parentPath = null;
         if (command.Request.ParentId != null)
         {
@@ -75,7 +78,8 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
             }
             parentPath = parentPathResult.Value;
         }
-
+        
+        //Построение нового пути
         string separator = parentPath is null ? string.Empty : ".";
         var pathResult = Path.Create($"{parentPath}{separator}{identifier.Value}");
         if (pathResult.IsFailure)
@@ -98,6 +102,7 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
             return department.Error;
         }
 
+        //Добавление локаций
         var departmentValue = department.Value;
         departmentValue.AddLocations(locationIds);
         await _departmentsRepository.AddAsync(department.Value, cancellationToken);

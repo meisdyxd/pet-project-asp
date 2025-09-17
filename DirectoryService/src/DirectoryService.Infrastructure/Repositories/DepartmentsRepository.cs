@@ -23,14 +23,14 @@ public class DepartmentsRepository : IDepartmentsRepository
         await _context.AddAsync(department, cancellationToken);
     }
 
-    public async Task<Result<string?, Error>> GetParentPathAsync(Guid parentId, CancellationToken cancellationToken)
+    public async Task<Result<string?, ErrorList>> GetParentPathAsync(Guid parentId, CancellationToken cancellationToken)
     {
         var parentDepartment = await _context.Departments
             .Where(d => d.Id == parentId)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (parentDepartment is null)
-            return Errors.Http.BadRequestError("Parent not found", "http.not.found");
+            return Errors.Http.BadRequestError("Parent not found");
 
         return parentDepartment.Path.Value;
     }
@@ -41,10 +41,7 @@ public class DepartmentsRepository : IDepartmentsRepository
             .Where(d => d.IsActive && departmentIds.Contains(d.Id))
             .CountAsync(cancellationToken);
 
-        if (count != departmentIds.Length)
-            return false;
-
-        return true;
+        return count == departmentIds.Length;
     }
 
     public async Task<Department?> GetByIdAsync(Guid departmentId, CancellationToken cancellationToken)

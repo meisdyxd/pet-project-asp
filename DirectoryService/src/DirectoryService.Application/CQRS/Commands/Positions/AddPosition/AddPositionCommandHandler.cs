@@ -10,6 +10,7 @@ using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Position;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace DirectoryService.Application.CQRS.Commands.Positions.AddPosition;
 
@@ -39,6 +40,7 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         AddPositionCommand command, 
         CancellationToken cancellationToken)
     {
+        //Валидация входных данных
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
             return validationResult.ToErrorList();
@@ -46,14 +48,18 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         var name = Name.Create(command.Request.Name).Value;
         var description = Description.Create(command.Request.Description).Value;
 
+        //Проверить на существование активной позиции с тем же наименованием
         var activePosition = await _positionsRepository.GetActiveByNameAsync(name, cancellationToken);
-
         if (activePosition != null)
-            return Errors.Http.Conflict("Active position already exists", "http.conflict").ToErrorList();
+            return Errors.Http.Conflict("Active position already exist");
         
-        var existActiveDepartmentsResult = await _departmentsRepository
+        //Проверить на существование активных отделов
+        var existActiveDepartments = await _departmentsRepository
             .ExistActiveDepartmentsAsync([.. command.Request.DepartmentIds], cancellationToken);
+        if (!existActiveDepartments)
+            return Errors.Http.UnprocessableContent("Not all departments found");
 
+        //Создание позиции
         var position = Position.Create(name, description);
         if (position.IsFailure)
         {
@@ -61,6 +67,7 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
             return position.Error;
         }
         
+        //Линковка с отделами
         var positionValue = position.Value;
         positionValue.LinkWithDepartments(command.Request.DepartmentIds);
         

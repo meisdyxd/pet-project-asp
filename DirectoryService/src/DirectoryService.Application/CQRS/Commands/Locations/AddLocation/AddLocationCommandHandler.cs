@@ -34,10 +34,12 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
     
     public async Task<UnitResult<ErrorList>> Handle(AddLocationCommand command, CancellationToken cancellationToken)
     {
+        //Валидация входных данных
         var resultValidation = await _validator.ValidateAsync(command, cancellationToken);
         if (!resultValidation.IsValid)
             return resultValidation.ToErrorList();
         
+        //Создание VO
         var name = Name.Create(command.Request.Name).Value;
         var addressDto = command.Request.Address;
         var address = Address.Create(
@@ -52,10 +54,12 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
             addressDto.Apartment).Value;
         var timezone = IANATimezone.Create(command.Request.Timezone).Value;
         
+        //Создание локации
         var location = Location.Create(name, address, timezone);
         if (location.IsFailure) 
-            return Errors.InvalidValue.Default("location").ToErrorList();
+            return location.Error;
         
+        //Сохранение
         await _locationsRepository.AddAsync(location.Value, cancellationToken);
         var result = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (result.IsFailure)

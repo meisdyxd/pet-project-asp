@@ -1,17 +1,31 @@
-﻿namespace DirectoryService.Contracts.Errors;
+﻿using DirectoryService.Contracts.Extensions;
+using System.Net;
+
+namespace DirectoryService.Contracts.Errors;
 
 public static class Errors
 {
     public static class Http
     {
-        public static Error InternalServerError()
-            => new Error("Internal server error", "internal.exception");
+        public static ErrorList InternalServerError()
+            => new Error("Internal server error", "internal.exception")
+            .ToErrorList((int)HttpStatusCode.InternalServerError);
         
-        public static Error BadRequestError(string message, string code) 
-            => new Error(message, code);
+        public static ErrorList BadRequestError(string message) 
+            => new Error(message, "http.bad.request")
+            .ToErrorList((int)HttpStatusCode.BadRequest);
         
-        public static Error Conflict(string message, string code) 
-            => new Error(message, code);
+        public static ErrorList Conflict(string message) 
+            => new Error(message, "http.conflict")
+            .ToErrorList((int)HttpStatusCode.Conflict);
+
+        public static ErrorList NotFound(string message)
+            => new Error(message, "http.not.found")
+            .ToErrorList((int)HttpStatusCode.NotFound);
+
+        public static ErrorList UnprocessableContent(string message)
+            => new Error(message, "http.unprocessable.content")
+            .ToErrorList((int)HttpStatusCode.UnprocessableContent);
     }
     public static class InvalidValue
     {

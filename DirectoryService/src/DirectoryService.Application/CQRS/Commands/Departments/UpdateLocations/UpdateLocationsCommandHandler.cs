@@ -8,6 +8,7 @@ using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Extensions;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace DirectoryService.Application.CQRS.Commands.Departments.UpdateLocations;
 
@@ -37,6 +38,7 @@ public class UpdateLocationsCommandHandler : ICommandHandler<UpdateLocationsComm
         UpdateLocationsCommand command, 
         CancellationToken cancellationToken)
     {
+        //Валидация входных данных
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
             return validationResult.ToErrorList();
@@ -44,15 +46,15 @@ public class UpdateLocationsCommandHandler : ICommandHandler<UpdateLocationsComm
         //Проверить — существует ли подразделение с таким departmentId и оно активно
         var department = await _departmentsRepository.GetByIdAsync(command.DepartmentId, cancellationToken);
         if (department == null)
-            return Errors.Http.BadRequestError("Department not found", "http.not.found").ToErrorList();
+            return Errors.Http.NotFound("Department not found");
         if (!department.IsActive)
-            return Errors.Http.BadRequestError("Department is non active", "http.logic").ToErrorList();
+            return Errors.Http.BadRequestError("Department is non active");
         
         //Проверить — все locationIds существуют и активны, нет дубликатов
         var activeLocationExists = await _locationsRepository
-            .ExistActiveLocationsAsync(command.Request.LocationIds.ToArray(), cancellationToken);
+            .ExistActiveLocationsAsync([.. command.Request.LocationIds], cancellationToken);
         if (!activeLocationExists)
-            return Errors.Http.BadRequestError("Invalid location ids", "http.not.found").ToErrorList();
+            return Errors.Http.UnprocessableContent("Invalid location ids");
         
         //Обновить — заменить старые привязки к локациям новым списком
         department.UpdateLocations(command.Request.LocationIds);
