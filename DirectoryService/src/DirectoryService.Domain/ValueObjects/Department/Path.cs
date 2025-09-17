@@ -28,7 +28,7 @@ public class Path : ValueObject
 
     public Result<Path, Error> CreateChild(Identifier childIdentifier)
     {
-        return new Path(Value + SEPARATOR + childIdentifier);
+        return new Path(Value + SEPARATOR + childIdentifier.Value);
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
