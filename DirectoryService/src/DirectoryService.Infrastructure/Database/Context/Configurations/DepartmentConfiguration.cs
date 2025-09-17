@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Contracts;
 using DirectoryService.Domain;
+using DirectoryService.Domain.ValueObjects.Department;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Path = DirectoryService.Domain.ValueObjects.Department.Path;
@@ -26,13 +27,16 @@ public class DepartmentConfiguration: IEntityTypeConfiguration<Department>
                 .IsRequired();
         });
         
-        builder.ComplexProperty(d => d.Identifier, ip =>
-        {
-            ip.Property(p => p.Value)
-                .HasMaxLength(Constants.DepartmentConstants.MAX_LENGTH_IDENTIFIER)
-                .HasColumnName("identifier")
-                .IsRequired();
-        });
+        builder.Property(d => d.Identifier)
+            .HasConversion(
+                toDb => toDb.Value,
+                fromDb => Identifier.Create(fromDb).Value)
+            .HasMaxLength(Constants.DepartmentConstants.MAX_LENGTH_IDENTIFIER)
+            .HasColumnName("identifier")
+            .IsRequired();
+        
+        builder.HasIndex(d => d.Identifier)
+            .IsUnique();
 
         builder.Property(d => d.Path)
             .HasConversion(
