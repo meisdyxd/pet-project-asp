@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Application.Interfaces.Database.IRepositories;
-using DirectoryService.Domain;
 using DirectoryService.Infrastructure.Database.Context;
 using Microsoft.EntityFrameworkCore;
+using DirectoryService.Domain;
 
 namespace DirectoryService.Infrastructure.Repositories;
 

@@ -1,10 +1,9 @@
-﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Interfaces.Database.IRepositories;
-using DirectoryService.Contracts;
-using DirectoryService.Contracts.Errors;
-using DirectoryService.Domain;
+﻿using DirectoryService.Application.Interfaces.Database.IRepositories;
 using DirectoryService.Infrastructure.Database.Context;
+using DirectoryService.Contracts.Errors;
 using Microsoft.EntityFrameworkCore;
+using CSharpFunctionalExtensions;
+using DirectoryService.Domain;
 
 namespace DirectoryService.Infrastructure.Repositories;
 

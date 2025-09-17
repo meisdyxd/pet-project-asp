@@ -74,7 +74,7 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
             if (parentPathResult.IsFailure)
             {
                 transaction.Rollback();
-                return parentPathResult.Error.ToErrorList();
+                return parentPathResult.Error;
             }
             parentPath = parentPathResult.Value;
         }

@@ -2,6 +2,7 @@
 using DirectoryService.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
 namespace DirectoryService.Infrastructure.Database.Context.Configurations;
 
@@ -12,9 +13,6 @@ public class DepartmentConfiguration: IEntityTypeConfiguration<Department>
         builder.ToTable("departments");
 
         builder.HasKey(d => d.Id);
-
-        builder.HasIndex(d => d.Path)
-            .IsUnique();
 
         builder.Property(d => d.Id)
             .HasColumnName("id")
@@ -35,13 +33,16 @@ public class DepartmentConfiguration: IEntityTypeConfiguration<Department>
                 .HasColumnName("identifier")
                 .IsRequired();
         });
-        
-        builder.ComplexProperty(d => d.Path, pp =>
-        {
-            pp.Property(p => p.Value)
-                .HasColumnName("path")
-                .IsRequired();
-        });
+
+        builder.Property(d => d.Path)
+            .HasConversion(
+                toDb => toDb.Value,
+                fromDb => Path.Create(fromDb).Value)
+            .HasColumnName("path")
+            .IsRequired();
+
+        builder.HasIndex(d => d.Path)
+            .IsUnique();
 
         builder.Property(d => d.Depth)
             .HasColumnName("depth")
