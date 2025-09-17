@@ -31,7 +31,7 @@ public class TransactionScope : ITransactionScope
         catch (Exception e)
         {
             _logger.LogError(e, "Error committing transaction");
-            return Errors.DbErrors.CommitTransaction().ToErrorList();
+            return Errors.DbErrors.CommitTransaction();
         }
     }
 
@@ -45,7 +45,7 @@ public class TransactionScope : ITransactionScope
         catch (Exception e)
         {
             _logger.LogError(e, "Error committing transaction");
-            return Errors.DbErrors.CommitTransaction().ToErrorList();
+            return Errors.DbErrors.CommitTransaction();
         }
     }
 

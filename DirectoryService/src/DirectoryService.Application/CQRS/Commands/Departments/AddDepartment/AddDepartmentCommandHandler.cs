@@ -48,7 +48,7 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         //Транзакция
         var transactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
         if (transactionResult.IsFailure)
-            return Errors.DbErrors.BeginTransaction().ToErrorList();
+            return Errors.DbErrors.BeginTransaction();
         using var transaction = transactionResult.Value;
         
         //Проверка существованяи локаций
@@ -83,7 +83,7 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         string separator = parentPath is null ? string.Empty : ".";
         var pathResult = Path.Create($"{parentPath}{separator}{identifier.Value}");
         if (pathResult.IsFailure)
-            return pathResult.Error.ToErrorList((int)HttpStatusCode.NotFound);
+            return pathResult.Error.ToErrorList();
 
         var path = pathResult.Value;
         short depth = (short)path.Value.Count(p => p == '.');

@@ -77,19 +77,24 @@ public static class Errors
 
     public static class DbErrors
     {
-        public static Error Default(string name)
-            => new($"DbError", "db.error");
+        public static ErrorList Default(string name)
+            => new Error($"DbError", "db.error")
+                .ToErrorList((int)HttpStatusCode.InternalServerError);
         
-        public static Error WhenSave(string message)
-            => new(message, "db.error.save");
-        
-        public static Error CommitTransaction()
-            => new("Failed to commit transaction", "transaction.error.commit");
-        
-        public static Error RollbackTransaction()
-            => new("Failed to rollback transaction", "transaction.error.rollback");
-        
-        public static Error BeginTransaction()
-            => new("Failed to begin transaction", "transaction.error.begin");
+        public static ErrorList WhenSave(string message, HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError)
+            => new Error(message, "db.error.save")
+                .ToErrorList((int)httpStatusCode);
+
+        public static ErrorList CommitTransaction()
+            => new Error("Failed to commit transaction", "transaction.error.commit")
+                .ToErrorList((int)HttpStatusCode.InternalServerError);
+
+        public static ErrorList RollbackTransaction()
+            => new Error("Failed to rollback transaction", "transaction.error.rollback")
+                .ToErrorList((int)HttpStatusCode.InternalServerError);
+
+        public static ErrorList BeginTransaction()
+            => new Error("Failed to begin transaction", "transaction.error.begin")
+                .ToErrorList((int)HttpStatusCode.InternalServerError);
     }
 }

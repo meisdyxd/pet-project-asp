@@ -5,8 +5,11 @@ using DirectoryService.Contracts;
 using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Extensions;
 using DirectoryService.Infrastructure.Database.Context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using System.Net;
 
 namespace DirectoryService.Infrastructure.Database;
 
@@ -39,7 +42,7 @@ public class TransactionManager : ITransactionManager
         catch (Exception e)
         {
             _logger.LogError(e, "An error occured during create transaction");
-            return Errors.DbErrors.BeginTransaction().ToErrorList();
+            return Errors.DbErrors.BeginTransaction();
         }
     }
 
@@ -50,10 +53,15 @@ public class TransactionManager : ITransactionManager
             await _context.SaveChangesAsync(cancellationToken);
             return UnitResult.Success<ErrorList>();
         }
-        catch(Exception ex)
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg && pg.SqlState == "23505")
+        {
+            _logger.LogError(ex, "Error during save changes: violation of the uniqueness of the index");
+            return Errors.DbErrors.WhenSave($"Violdation of the uniqueness of the index", HttpStatusCode.Conflict);
+        }
+        catch (Exception ex)
         {
             _logger.LogError(ex, "An error occured during save changes");
-            return Errors.DbErrors.WhenSave(ex.Message).ToErrorList();
+            return Errors.DbErrors.WhenSave(ex.Message);
         }
     }
 }
