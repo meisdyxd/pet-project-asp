@@ -37,7 +37,7 @@ public class DepartmentConfiguration: IEntityTypeConfiguration<Department>
         builder.Property(d => d.Path)
             .HasConversion(
                 toDb => toDb.Value,
-                fromDb => Path.Create(fromDb).Value)
+                fromDb => Path.CreateParent(fromDb).Value)
             .HasColumnName("path")
             .IsRequired();
 

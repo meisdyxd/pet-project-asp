@@ -64,7 +64,7 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         var identifier = Identifier.Create(command.Request.Identifier).Value;
         
         //Получение родительского пути, для построения нового
-        string? parentPath = null;
+        Path? parentPath = null;
         if (command.Request.ParentId != null)
         {
             var parentPathResult = await _departmentsRepository.GetParentPathAsync(
@@ -80,8 +80,9 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         }
         
         //Построение нового пути
-        string separator = parentPath is null ? string.Empty : ".";
-        var pathResult = Path.Create($"{parentPath}{separator}{identifier.Value}");
+        var pathResult = parentPath is null 
+            ? Path.CreateParent(identifier.Value)
+            : parentPath.CreateChild(identifier);
         if (pathResult.IsFailure)
             return pathResult.Error.ToErrorList();
 

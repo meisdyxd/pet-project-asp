@@ -4,6 +4,8 @@ using DirectoryService.Contracts.Errors;
 using Microsoft.EntityFrameworkCore;
 using CSharpFunctionalExtensions;
 using DirectoryService.Domain;
+using DirectoryService.Domain.ValueObjects.Department;
+using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
 namespace DirectoryService.Infrastructure.Repositories;
 
@@ -22,7 +24,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         await _context.AddAsync(department, cancellationToken);
     }
 
-    public async Task<Result<string?, ErrorList>> GetParentPathAsync(Guid parentId, CancellationToken cancellationToken)
+    public async Task<Result<Path?, ErrorList>> GetParentPathAsync(Guid parentId, CancellationToken cancellationToken)
     {
         var parentDepartment = await _context.Departments
             .Where(d => d.Id == parentId)
@@ -31,7 +33,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         if (parentDepartment is null)
             return Errors.Http.BadRequestError("Parent not found");
 
-        return parentDepartment.Path.Value;
+        return parentDepartment.Path;
     }
 
    public async Task<bool> ExistActiveDepartmentsAsync(Guid[] departmentIds, CancellationToken cancellationToken)

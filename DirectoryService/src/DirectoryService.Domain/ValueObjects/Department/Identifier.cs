@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Errors;
@@ -28,7 +29,10 @@ public class Identifier : ValueObject
                 nameof(Identifier).ToLower(),
                 Constants.DepartmentConstants.MIN_LENGTH_IDENTIFIER,
                 Constants.DepartmentConstants.MAX_LENGTH_IDENTIFIER));
-        
+
+        if (!Regex.IsMatch(value, Constants.DepartmentConstants.REGEX_IDENTIFIER))
+            errors.Add(Errors.InvalidValue.Default("identifier"));
+
         if (errors.Count != 0)
             return new ErrorList(errors, HttpStatusCode.BadRequest);
         
