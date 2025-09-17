@@ -23,7 +23,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         await _context.AddAsync(department, cancellationToken);
     }
 
-    public async Task<Result<string?, Error>> GetParentPathAsync(Guid parentId, string identifier, CancellationToken cancellationToken)
+    public async Task<Result<string?, Error>> GetParentPathAsync(Guid parentId, CancellationToken cancellationToken)
     {
         var parentDepartment = await _context.Departments
             .Where(d => d.Id == parentId)

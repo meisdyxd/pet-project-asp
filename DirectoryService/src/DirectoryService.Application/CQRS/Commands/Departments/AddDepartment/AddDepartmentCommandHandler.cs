@@ -9,6 +9,7 @@ using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Department;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using System.Net;
 using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
 namespace DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
@@ -53,30 +54,34 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         if (!existLocations)
         {
             transaction.Rollback();
-            return Errors.Http.BadRequestError("Locations not found", "http.not.found").ToErrorList();
+            return Errors.Http.BadRequestError("Locations not found", "http.unprocessable.content")
+                .ToErrorList((int)HttpStatusCode.UnprocessableContent);
         }
         
         var name = Name.Create(command.Request.Name).Value;
         var identifier = Identifier.Create(command.Request.Identifier).Value;
         
-        string parentPath = string.Empty;
+        string? parentPath = null;
         if (command.Request.ParentId != null)
         {
-            var pathResult = await _departmentsRepository.GetParentPathAsync(
-                command.Request.ParentId.Value, 
-                command.Request.Identifier, 
+            var parentPathResult = await _departmentsRepository.GetParentPathAsync(
+                command.Request.ParentId.Value,
                 cancellationToken);
             
-            if (pathResult.IsFailure)
+            if (parentPathResult.IsFailure)
             {
                 transaction.Rollback();
-                return pathResult.Error.ToErrorList();
+                return parentPathResult.Error.ToErrorList();
             }
-            parentPath = pathResult.Value;
+            parentPath = parentPathResult.Value;
         }
 
-        string separator = parentPath == string.Empty ? string.Empty : ".";
-        var path = Path.Create($"{parentPath}{separator}{identifier.Value}").Value;
+        string separator = parentPath is null ? string.Empty : ".";
+        var pathResult = Path.Create($"{parentPath}{separator}{identifier.Value}");
+        if (pathResult.IsFailure)
+            return pathResult.Error.ToErrorList((int)HttpStatusCode.NotFound);
+
+        var path = pathResult.Value;
         short depth = (short)path.Value.Count(p => p == '.');
         
         var department = Department.Create(
