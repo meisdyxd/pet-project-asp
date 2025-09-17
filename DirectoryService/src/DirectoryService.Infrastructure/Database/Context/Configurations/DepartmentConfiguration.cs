@@ -13,6 +13,9 @@ public class DepartmentConfiguration: IEntityTypeConfiguration<Department>
 
         builder.HasKey(d => d.Id);
 
+        builder.HasIndex(d => d.Path)
+            .IsUnique();
+
         builder.Property(d => d.Id)
             .HasColumnName("id")
             .HasDefaultValueSql("uuid_generate_v4()");

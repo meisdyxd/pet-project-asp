@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Contracts.Requests.DepartmentRequests;
 
-public class UpdateLocationsRequest
+public sealed record UpdateLocationsRequest
 {
     public IEnumerable<Guid> LocationIds { get; set; } = [];
 }

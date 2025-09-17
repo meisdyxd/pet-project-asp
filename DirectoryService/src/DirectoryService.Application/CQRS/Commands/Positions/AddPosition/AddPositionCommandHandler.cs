@@ -45,19 +45,11 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         
         var name = Name.Create(command.Request.Name).Value;
         var description = Description.Create(command.Request.Description).Value;
-        
-        var transactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
-        if (transactionResult.IsFailure)
-            return Errors.DbErrors.BeginTransaction().ToErrorList();
-        using var transaction = transactionResult.Value;
 
         var activePosition = await _positionsRepository.GetActiveByNameAsync(name, cancellationToken);
 
         if (activePosition != null)
-        {
-            transaction.Rollback();
             return Errors.Http.Conflict("Active position already exists", "http.conflict").ToErrorList();
-        }
         
         var existActiveDepartmentsResult = await _departmentsRepository
             .ExistActiveDepartmentsAsync([.. command.Request.DepartmentIds], cancellationToken);
@@ -65,7 +57,6 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         var position = Position.Create(name, description);
         if (position.IsFailure)
         {
-            transaction.Rollback();
             _logger.LogInformation("Failed create a department");
             return position.Error;
         }
@@ -77,14 +68,7 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         
         var resultSave = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (resultSave.IsFailure)
-        {
-            transaction.Rollback();
             return resultSave.Error;
-        }
-        
-        var transactionCommit = transaction.Commit();
-        if (transactionCommit.IsFailure)
-            return transactionCommit.Error;
         
         return UnitResult.Success<ErrorList>();
     }

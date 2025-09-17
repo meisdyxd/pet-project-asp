@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Contracts.Requests.PositionRequests;
 
-public class AddPositionRequest
+public sealed record AddPositionRequest
 {
     public string Name { get; init; } = string.Empty;
     public string? Description { get; init; }

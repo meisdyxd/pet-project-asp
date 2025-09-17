@@ -1,12 +1,11 @@
-﻿using DirectoryService.Application.Interfaces;
+﻿using DirectoryService.Application.Interfaces.Database.IRepositories;
 using DirectoryService.Application.Interfaces.Database;
-using DirectoryService.Application.Interfaces.Database.IRepositories;
-using DirectoryService.Infrastructure.Database;
 using DirectoryService.Infrastructure.Database.Context;
 using DirectoryService.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using DirectoryService.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure;
