@@ -1,11 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.CQRS.Commands.AddDepartment;
+using DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
 using DirectoryService.Application.Extensions;
-using DirectoryService.Application.Interfaces;
 using DirectoryService.Application.Interfaces.CQRS;
-using DirectoryService.Application.Interfaces.IRepositories;
-using DirectoryService.Contracts;
-using DirectoryService.Contracts.Extensions;
+using DirectoryService.Application.Interfaces.Database;
+using DirectoryService.Application.Interfaces.Database.IRepositories;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Position;
 using FluentValidation;
@@ -48,7 +47,7 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         
         var transactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
         if (transactionResult.IsFailure)
-            return Errors.DbErrors.BeginTransaction().ToErrorList();
+            return Errors.DbErrors.BeginTransaction();
         using var transaction = transactionResult.Value;
 
         var activePosition = await _positionsRepository.GetActiveByNameAsync(name, cancellationToken);
@@ -56,7 +55,7 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         if (activePosition != null)
         {
             transaction.Rollback();
-            return Errors.Http.Conflict("Active position already exists", "http.conflict").ToErrorList();
+            return Errors.Http.Conflict("Active position already exists");
         }
         
         var existActiveDepartmentsResult = await _departmentsRepository

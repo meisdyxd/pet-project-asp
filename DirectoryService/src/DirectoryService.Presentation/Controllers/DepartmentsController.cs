@@ -1,6 +1,5 @@
 ﻿using DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
 using DirectoryService.Application.CQRS.Commands.Departments.UpdateLocations;
-using DirectoryService.Contracts.Requests;
 using DirectoryService.Contracts.Requests.DepartmentRequests;
 using DirectoryService.Presentation.Extensions;
 using Microsoft.AspNetCore.Mvc;
