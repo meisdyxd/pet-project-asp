@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Domain.ValueObjects.Department;
 using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
@@ -66,5 +67,11 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
         var departmentLocations = locations
             .Select(l => DepartmentLocation.Create(l, Id).Value);
         _departmentLocations.AddRange(departmentLocations);
+    }
+
+    public void UpdateLocations(IEnumerable<Guid> locations)
+    {
+        _departmentLocations.Clear();
+        AddLocations(locations);
     }
 }

@@ -1,8 +1,8 @@
-﻿using DirectoryService.Application.Interfaces.IRepositories;
-using DirectoryService.Domain;
-using DirectoryService.Domain.ValueObjects.Position;
+﻿using DirectoryService.Application.Interfaces.Database.IRepositories;
 using DirectoryService.Infrastructure.Database.Context;
+using DirectoryService.Domain.ValueObjects.Position;
 using Microsoft.EntityFrameworkCore;
+using DirectoryService.Domain;
 
 namespace DirectoryService.Infrastructure.Repositories;
 

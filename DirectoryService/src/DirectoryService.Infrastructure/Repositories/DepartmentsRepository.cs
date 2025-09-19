@@ -1,9 +1,11 @@
-﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Interfaces.IRepositories;
-using DirectoryService.Contracts;
-using DirectoryService.Domain;
+﻿using DirectoryService.Application.Interfaces.Database.IRepositories;
 using DirectoryService.Infrastructure.Database.Context;
+using DirectoryService.Contracts.Errors;
 using Microsoft.EntityFrameworkCore;
+using CSharpFunctionalExtensions;
+using DirectoryService.Domain;
+using DirectoryService.Domain.ValueObjects.Department;
+using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
 namespace DirectoryService.Infrastructure.Repositories;
 
@@ -22,35 +24,31 @@ public class DepartmentsRepository : IDepartmentsRepository
         await _context.AddAsync(department, cancellationToken);
     }
 
-    public async Task<Result<string, Error>> GetParentPathAsync(Guid parentId, string identifier, CancellationToken cancellationToken)
+    public async Task<Result<Path?, ErrorList>> GetParentPathAsync(Guid parentId, CancellationToken cancellationToken)
     {
         var parentDepartment = await _context.Departments
             .Where(d => d.Id == parentId)
-            .Select(d => new
-            {
-                d.Path,
-                IsUniqueIdentifier = d.ChildrenDepartments.All(cd => cd.Identifier.Value != identifier)
-            })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (parentDepartment is null)
-            return Errors.Http.BadRequestError("Parent path not found", "http.not.found");
+            return Errors.Http.BadRequestError("Parent not found");
 
-        if (!parentDepartment.IsUniqueIdentifier)
-            return Errors.Http.Conflict("Department identifier must be unique", "http.conflict");
-
-        return parentDepartment.Path.Value;
+        return parentDepartment.Path;
     }
 
-   public async Task<Result<bool, Error>> ExistActiveDepartmentsAsync(Guid[] departmentIds, CancellationToken cancellationToken)
+   public async Task<bool> ExistActiveDepartmentsAsync(Guid[] departmentIds, CancellationToken cancellationToken)
     {
         var count = await _context.Departments
             .Where(d => d.IsActive && departmentIds.Contains(d.Id))
             .CountAsync(cancellationToken);
 
-        if (count != departmentIds.Length)
-            return Errors.Http.BadRequestError("Undefined departments", "http.not.found");
+        return count == departmentIds.Length;
+    }
 
-        return true;
+    public async Task<Department?> GetByIdAsync(Guid departmentId, CancellationToken cancellationToken)
+    {
+        return await _context.Departments
+            .Include(d => d.DepartmentLocations)
+            .FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken);
     }
 }

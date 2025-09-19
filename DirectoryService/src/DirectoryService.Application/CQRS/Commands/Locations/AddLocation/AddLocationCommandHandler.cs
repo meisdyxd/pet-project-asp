@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Extensions;
-using DirectoryService.Application.Interfaces;
 using DirectoryService.Application.Interfaces.CQRS;
-using DirectoryService.Application.Interfaces.IRepositories;
-using DirectoryService.Contracts;
+using DirectoryService.Application.Interfaces.Database;
+using DirectoryService.Application.Interfaces.Database.IRepositories;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Common;
@@ -11,7 +11,7 @@ using DirectoryService.Domain.ValueObjects.Location;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 
-namespace DirectoryService.Application.CQRS.Commands.AddLocation;
+namespace DirectoryService.Application.CQRS.Commands.Locations.AddLocation;
 
 public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
 {
@@ -34,10 +34,12 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
     
     public async Task<UnitResult<ErrorList>> Handle(AddLocationCommand command, CancellationToken cancellationToken)
     {
+        //Валидация входных данных
         var resultValidation = await _validator.ValidateAsync(command, cancellationToken);
         if (!resultValidation.IsValid)
             return resultValidation.ToErrorList();
         
+        //Создание VO
         var name = Name.Create(command.Request.Name).Value;
         var addressDto = command.Request.Address;
         var address = Address.Create(
@@ -52,10 +54,12 @@ public class AddLocationCommandHandler : ICommandHandler<AddLocationCommand>
             addressDto.Apartment).Value;
         var timezone = IANATimezone.Create(command.Request.Timezone).Value;
         
+        //Создание локации
         var location = Location.Create(name, address, timezone);
         if (location.IsFailure) 
-            return Errors.InvalidValue.Default("location").ToErrorList();
+            return location.Error;
         
+        //Сохранение
         await _locationsRepository.AddAsync(location.Value, cancellationToken);
         var result = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (result.IsFailure)

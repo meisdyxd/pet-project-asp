@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Domain;
 
 namespace DirectoryService.Presentation.Middlewares;
@@ -22,7 +23,7 @@ public class CustomExceptionMiddleware : IMiddleware
         catch
         {
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            await context.Response.WriteAsJsonAsync(Envelope.Failure([Errors.Http.InternalServerError()]));
+            await context.Response.WriteAsJsonAsync(Envelope.Failure(Errors.Http.InternalServerError().Errors));
         }
     }
 }

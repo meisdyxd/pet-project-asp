@@ -1,3 +1,5 @@
+using DirectoryService.Contracts.Errors;
+
 namespace DirectoryService.Contracts.Extensions;
 
 public static class ErrorExtensions

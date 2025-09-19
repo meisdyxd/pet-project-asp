@@ -42,6 +42,12 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("depth");
 
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("identifier");
+
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -52,22 +58,16 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("parent_id");
 
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("path");
+
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("now()");
-
-                    b.ComplexProperty<Dictionary<string, object>>("Identifier", "DirectoryService.Domain.Department.Identifier#Identifier", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("character varying(150)")
-                                .HasColumnName("identifier");
-                        });
 
                     b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Department.Name#Name", b1 =>
                         {
@@ -80,19 +80,15 @@ namespace DirectoryService.Infrastructure.Database.Migrations
                                 .HasColumnName("name");
                         });
 
-                    b.ComplexProperty<Dictionary<string, object>>("Path", "DirectoryService.Domain.Department.Path#Path", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("path");
-                        });
-
                     b.HasKey("Id");
 
+                    b.HasIndex("Identifier")
+                        .IsUnique();
+
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("Path")
+                        .IsUnique();
 
                     b.ToTable("departments", (string)null);
                 });

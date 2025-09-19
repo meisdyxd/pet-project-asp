@@ -1,6 +1,6 @@
-﻿namespace DirectoryService.Contracts.Requests;
+﻿namespace DirectoryService.Contracts.Requests.DepartmentRequests;
 
-public class AddDepartmentRequest
+public sealed record AddDepartmentRequest
 {
     public string Name { get; init; } = string.Empty;
     public string Identifier { get; init; } = string.Empty;

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using CSharpFunctionalExtensions;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Errors;
 using FluentValidation;
 using FluentValidation.Results;
 

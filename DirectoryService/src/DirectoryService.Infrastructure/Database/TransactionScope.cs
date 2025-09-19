@@ -1,7 +1,9 @@
 ﻿using System.Data;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Interfaces;
+using DirectoryService.Application.Interfaces.Database;
 using DirectoryService.Contracts;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Extensions;
 using Microsoft.Extensions.Logging;
 
@@ -29,7 +31,7 @@ public class TransactionScope : ITransactionScope
         catch (Exception e)
         {
             _logger.LogError(e, "Error committing transaction");
-            return Errors.DbErrors.CommitTransaction().ToErrorList();
+            return Errors.DbErrors.CommitTransaction();
         }
     }
 
@@ -43,7 +45,7 @@ public class TransactionScope : ITransactionScope
         catch (Exception e)
         {
             _logger.LogError(e, "Error committing transaction");
-            return Errors.DbErrors.CommitTransaction().ToErrorList();
+            return Errors.DbErrors.CommitTransaction();
         }
     }
 

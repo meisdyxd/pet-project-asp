@@ -1,6 +1,6 @@
 ﻿using DirectoryService.Domain;
 
-namespace DirectoryService.Application.Interfaces;
+namespace DirectoryService.Application.Interfaces.Database;
 
 public interface IReadDbContext
 {

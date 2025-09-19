@@ -1,6 +1,6 @@
-﻿using DirectoryService.Application.Interfaces;
-using DirectoryService.Domain;
+﻿using DirectoryService.Application.Interfaces.Database;
 using Microsoft.EntityFrameworkCore;
+using DirectoryService.Domain;
 
 namespace DirectoryService.Infrastructure.Database.Context;
 

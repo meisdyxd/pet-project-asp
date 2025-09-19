@@ -1,7 +1,7 @@
-﻿using DirectoryService.Application.Interfaces.IRepositories;
-using DirectoryService.Domain;
+﻿using DirectoryService.Application.Interfaces.Database.IRepositories;
 using DirectoryService.Infrastructure.Database.Context;
 using Microsoft.EntityFrameworkCore;
+using DirectoryService.Domain;
 
 namespace DirectoryService.Infrastructure.Repositories;
 
@@ -22,6 +22,16 @@ public class LocationsRepository : ILocationsRepository
     public async Task<bool> ExistLocationsAsync(Guid[] locationIds, CancellationToken cancellationToken)
     {
         var locationCount = await _context.Locations
+            .Where(l => locationIds.Contains(l.Id))
+            .CountAsync(cancellationToken);
+
+        return locationCount == locationIds.Length;
+    }
+    
+    public async Task<bool> ExistActiveLocationsAsync(Guid[] locationIds, CancellationToken cancellationToken)
+    {
+        var locationCount = await _context.Locations
+            .Where(l => l.IsActive)
             .Where(l => locationIds.Contains(l.Id))
             .CountAsync(cancellationToken);
 

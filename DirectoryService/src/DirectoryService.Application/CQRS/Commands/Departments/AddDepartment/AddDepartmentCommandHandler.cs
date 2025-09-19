@@ -1,17 +1,18 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Interfaces;
-using DirectoryService.Application.Interfaces.CQRS;
-using DirectoryService.Contracts;
 using DirectoryService.Application.Extensions;
-using DirectoryService.Application.Interfaces.IRepositories;
+using DirectoryService.Application.Interfaces.CQRS;
+using DirectoryService.Application.Interfaces.Database;
+using DirectoryService.Application.Interfaces.Database.IRepositories;
+using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Extensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.ValueObjects.Department;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using System.Net;
 using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
-namespace DirectoryService.Application.CQRS.Commands.AddDepartment;
+namespace DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
 
 public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
 {
@@ -39,44 +40,53 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
         AddDepartmentCommand command, 
         CancellationToken cancellationToken)
     {
+        //Валидация входных данных
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
             return validationResult.ToErrorList();
         
+        //Транзакция
         var transactionResult = await _transactionManager.BeginTransactionAsync(cancellationToken);
         if (transactionResult.IsFailure)
-            return Errors.DbErrors.BeginTransaction().ToErrorList();
+            return Errors.DbErrors.BeginTransaction();
         using var transaction = transactionResult.Value;
         
+        //Проверка существованяи локаций
         var locationIds = (command.Request.LocationIds ?? []).ToArray();
         var existLocations = await _locationsRepository.ExistLocationsAsync(locationIds, cancellationToken);
         if (!existLocations)
         {
             transaction.Rollback();
-            return Errors.Http.BadRequestError("Locations not found", "http.not.found").ToErrorList();
+            return Errors.Http.UnprocessableContent("Not all locations found");
         }
         
         var name = Name.Create(command.Request.Name).Value;
         var identifier = Identifier.Create(command.Request.Identifier).Value;
         
-        string parentPath = string.Empty;
+        //Получение родительского пути, для построения нового
+        Path? parentPath = null;
         if (command.Request.ParentId != null)
         {
-            var pathResult = await _departmentsRepository.GetParentPathAsync(
-                command.Request.ParentId.Value, 
-                command.Request.Identifier, 
+            var parentPathResult = await _departmentsRepository.GetParentPathAsync(
+                command.Request.ParentId.Value,
                 cancellationToken);
             
-            if (pathResult.IsFailure)
+            if (parentPathResult.IsFailure)
             {
                 transaction.Rollback();
-                return pathResult.Error.ToErrorList();
+                return parentPathResult.Error;
             }
-            parentPath = pathResult.Value;
+            parentPath = parentPathResult.Value;
         }
+        
+        //Построение нового пути
+        var pathResult = parentPath is null 
+            ? Path.CreateParent(identifier.Value)
+            : parentPath.CreateChild(identifier);
+        if (pathResult.IsFailure)
+            return pathResult.Error.ToErrorList();
 
-        string separator = parentPath == string.Empty ? string.Empty : ".";
-        var path = Path.Create($"{parentPath}{separator}{identifier.Value}").Value;
+        var path = pathResult.Value;
         short depth = (short)path.Value.Count(p => p == '.');
         
         var department = Department.Create(
@@ -93,6 +103,7 @@ public class AddDepartmentCommandHandler : ICommandHandler<AddDepartmentCommand>
             return department.Error;
         }
 
+        //Добавление локаций
         var departmentValue = department.Value;
         departmentValue.AddLocations(locationIds);
         await _departmentsRepository.AddAsync(department.Value, cancellationToken);

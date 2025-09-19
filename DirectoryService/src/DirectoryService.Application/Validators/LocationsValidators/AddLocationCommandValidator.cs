@@ -1,10 +1,10 @@
-﻿using DirectoryService.Application.CQRS.Commands.AddLocation;
+﻿using DirectoryService.Application.CQRS.Commands.Locations.AddLocation;
 using DirectoryService.Application.Extensions;
 using DirectoryService.Contracts;
 using DirectoryService.Domain.ValueObjects.Common;
 using FluentValidation;
 
-namespace DirectoryService.Application.Validators;
+namespace DirectoryService.Application.Validators.LocationsValidators;
 
 public class AddLocationCommandValidator : AbstractValidator<AddLocationCommand>
 {

@@ -1,5 +1,4 @@
-using System.Net;
-using DirectoryService.Contracts;
+﻿using DirectoryService.Contracts.Errors;
 using DirectoryService.Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +21,8 @@ public static class ErrorExtensions
             408 => StatusCodes.Status408RequestTimeout,
             409 => StatusCodes.Status409Conflict,
             410 => StatusCodes.Status410Gone,
+            422 => StatusCodes.Status422UnprocessableEntity,
+            502 => StatusCodes.Status502BadGateway,
             _ => StatusCodes.Status500InternalServerError,
         };
         
