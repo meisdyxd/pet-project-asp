@@ -1,12 +1,12 @@
-﻿using DirectoryService.Application.CQRS.Commands.Departments.ChangeParent;
+﻿using DirectoryService.Application.CQRS.Commands.Departments.TransferDepartment;
 using DirectoryService.Application.Extensions;
 using FluentValidation;
 
 namespace DirectoryService.Application.Validators.DepartmentsValidators;
 
-public class ChangeParentCommandValidator : AbstractValidator<ChangeParentCommand>
+public class TransferDepartmentCommandValidator : AbstractValidator<TransferDepartmentCommand>
 {
-    public ChangeParentCommandValidator()
+    public TransferDepartmentCommandValidator()
     {
         RuleFor(c => c.Request.ParentId)
             .Must(c => c != default)

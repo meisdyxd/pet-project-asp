@@ -7,20 +7,20 @@ using DirectoryService.Contracts.Errors;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 
-namespace DirectoryService.Application.CQRS.Commands.Departments.ChangeParent;
+namespace DirectoryService.Application.CQRS.Commands.Departments.TransferDepartment;
 
-public class ChangeParentCommandHandler : ICommandHandler<ChangeParentCommand>
+public class TransferDepartmentCommandHandler : ICommandHandler<TransferDepartmentCommand>
 {
-    private readonly ILogger<ChangeParentCommandHandler> _logger;
+    private readonly ILogger<TransferDepartmentCommandHandler> _logger;
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ITransactionManager _transactionManager;
-    private readonly IValidator<ChangeParentCommand> _validator;
+    private readonly IValidator<TransferDepartmentCommand> _validator;
 
-    public ChangeParentCommandHandler(
+    public TransferDepartmentCommandHandler(
         IDepartmentsRepository departmentsRepository,
         ITransactionManager transactionManager,
-        IValidator<ChangeParentCommand> validator,
-        ILogger<ChangeParentCommandHandler> logger)
+        IValidator<TransferDepartmentCommand> validator,
+        ILogger<TransferDepartmentCommandHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _transactionManager = transactionManager;
@@ -29,7 +29,7 @@ public class ChangeParentCommandHandler : ICommandHandler<ChangeParentCommand>
     }
     
     public async Task<UnitResult<ErrorList>> Handle(
-        ChangeParentCommand command, 
+        TransferDepartmentCommand command, 
         CancellationToken cancellationToken)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
@@ -127,7 +127,7 @@ public class ChangeParentCommandHandler : ICommandHandler<ChangeParentCommand>
             transaction.Rollback();
             return resultAction.Error;
         }
-
+        await _departmentsRepository.UpdateParentAsync(command.DepartmentId, command.Request.ParentId, cancellationToken);
         await _transactionManager.SaveChangesAsync(cancellationToken);
         transaction.Commit();
 

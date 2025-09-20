@@ -16,4 +16,5 @@ public interface IDepartmentsRepository
     Task<Result<bool, ErrorList>> CheckTransferable(Guid fromId, Guid? toId, IDbTransaction transaction, CancellationToken cancellationToken);
     Task<Result<LockDepartmentDto?, ErrorList>> GetByIdWithLockAsync(Guid departmentId, IDbTransaction transaction, CancellationToken cancellationToken);
     Task<UnitResult<ErrorList>> TransferDepartmentAsync(string fromPath, string? toPath, IDbTransaction transaction, CancellationToken cancellationToken);
+    Task UpdateParentAsync(Guid departmentId, Guid? parentId, CancellationToken cancellationToken);
 }

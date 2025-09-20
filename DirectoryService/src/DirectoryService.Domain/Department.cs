@@ -74,4 +74,9 @@ public class Department: Entity<Guid>, ISoftDeletableEntity, IAuditableEntity
         _departmentLocations.Clear();
         AddLocations(locations);
     }
+
+    public void UpdateParent(Guid? parentId)
+    {
+        ParentId = parentId;
+    }
 }

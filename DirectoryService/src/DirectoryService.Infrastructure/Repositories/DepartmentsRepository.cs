@@ -134,18 +134,11 @@ public class DepartmentsRepository : IDepartmentsRepository
         });
 
         var cmd = new CommandDefinition(@"
-            UPDATE departments d
+            UPDATE departments
             SET
-                path = np.new_path,
-                ""depth"" = nlevel(np.new_path)
-            FROM (
-                SELECT
-                    id,
-                    @ToPath::ltree || subpath(path::ltree, nlevel(@FromPath::ltree) - 1) AS new_path
-                FROM departments
-                WHERE path::ltree <@ @FromPath::ltree
-            ) AS np
-            WHERE d.id = np.id;",
+              path   = @ToPath::ltree || subpath(path::ltree, nlevel(@FromPath::ltree) - 1),
+              ""depth""= nlevel(@ToPath::ltree || subpath(path::ltree, nlevel(@FromPath::ltree) - 1)) - 1
+            WHERE path::ltree <@ @FromPath::ltree;",
             dynamicParameters,
             transaction: transaction,
             cancellationToken: cancellationToken);
@@ -153,5 +146,11 @@ public class DepartmentsRepository : IDepartmentsRepository
         await connection.ExecuteAsync(cmd);
 
         return UnitResult.Success<ErrorList>();
+    }
+
+    public async Task UpdateParentAsync(Guid departmentId, Guid? parentId, CancellationToken cancellationToken)
+    {
+        await _context.Departments.Where(d => d.Id == departmentId)
+            .ExecuteUpdateAsync(d => d.SetProperty(p => p.ParentId, parentId), cancellationToken);
     }
 }
