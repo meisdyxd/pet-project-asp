@@ -2,9 +2,7 @@
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Interfaces;
 using DirectoryService.Application.Interfaces.Database;
-using DirectoryService.Contracts;
 using DirectoryService.Contracts.Errors;
-using DirectoryService.Contracts.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Database;
@@ -20,6 +18,8 @@ public class TransactionScope : ITransactionScope
         _transaction = transaction;
         _logger = logger;
     }
+
+    public IDbTransaction GetTransaction => _transaction;
 
     public UnitResult<ErrorList> Commit()
     {
