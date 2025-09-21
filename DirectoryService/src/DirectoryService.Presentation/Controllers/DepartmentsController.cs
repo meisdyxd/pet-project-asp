@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
+using DirectoryService.Application.CQRS.Commands.Departments.TransferDepartment;
 using DirectoryService.Application.CQRS.Commands.Departments.UpdateLocations;
 using DirectoryService.Contracts.Requests.DepartmentRequests;
 using DirectoryService.Presentation.Extensions;
@@ -23,7 +24,7 @@ public class DepartmentsController : MainController
         return Created();
     }
 
-    [HttpPut("{departmentId}/locations")]
+    [HttpPut("{departmentId:guid}/locations")]
     public async Task<IActionResult> UpdateLocation(
         [FromRoute] Guid departmentId,
         [FromBody] UpdateLocationsRequest request,
@@ -33,6 +34,21 @@ public class DepartmentsController : MainController
         var command = new UpdateLocationsCommand(departmentId, request);
         var result = await handler.Handle(command, cancellationToken);
         if(result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok();
+    }
+
+    [HttpPut("{departmentId:guid}/parent")]
+    public async Task<IActionResult> ChangeParent(
+        [FromRoute] Guid departmentId,
+        [FromBody] TransferDepartmentRequest request,
+        [FromServices] TransferDepartmentCommandHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new TransferDepartmentCommand(departmentId, request);
+        var result = await handler.Handle(command, cancellationToken);
+        if (result.IsFailure)
             return result.Error.ToResponse();
 
         return Ok();
