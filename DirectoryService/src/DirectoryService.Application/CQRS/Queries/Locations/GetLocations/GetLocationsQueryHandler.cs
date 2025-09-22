@@ -9,6 +9,7 @@ using DirectoryService.Contracts.Dtos;
 using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Respones.LocationResponses;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.CQRS.Queries.Locations.GetLocations;
 
@@ -16,13 +17,16 @@ public class GetLocationsQueryHandler : IQueryHandler<GetLocationsQuery, GetLoca
 {
     private readonly IDapperConnectionFactory _connectionFactory;
     private readonly IValidator<GetLocationsQuery> _validator;
+    private readonly ILogger<GetLocationsQueryHandler> _logger;
     
     public GetLocationsQueryHandler(
         IDapperConnectionFactory connectionFactory,
-        IValidator<GetLocationsQuery> validator)
+        IValidator<GetLocationsQuery> validator,
+        ILogger<GetLocationsQueryHandler> logger)
     {
         _connectionFactory = connectionFactory;
         _validator = validator;
+        _logger = logger;
     }
     
     public async Task<Result<GetLocationsResponse, ErrorList>> Handle(
@@ -116,20 +120,28 @@ public class GetLocationsQueryHandler : IQueryHandler<GetLocationsQuery, GetLoca
         dynamicParameters.Add("@Limit", query.Request.PageSize);
 
         long totalCount = 0;
-        var result = await connection.QueryAsync<GetLocationDto, long, GetLocationDto>(
-            withQuerySql.ToString(),
-            splitOn: "total_count",
-            map: (dto, l) =>
-            {
-                totalCount = l;
-                return dto;
-            }, 
-            param: dynamicParameters);
+        try
+        {
+            var result = await connection.QueryAsync<GetLocationDto, long, GetLocationDto>(
+                withQuerySql.ToString(),
+                splitOn: "total_count",
+                map: (dto, l) =>
+                {
+                    totalCount = l;
+                    return dto;
+                }, 
+                param: dynamicParameters);
         
-        return new GetLocationsResponse(
-            [.. result],
-            query.Request.Page,
-            query.Request.PageSize,
-            totalCount);
+            return new GetLocationsResponse(
+                [.. result],
+                query.Request.Page,
+                query.Request.PageSize,
+                totalCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "While get locations with message: {message}", ex.Message);
+            return Errors.DbErrors.Default(ex.Message);
+        }
     }
 }
