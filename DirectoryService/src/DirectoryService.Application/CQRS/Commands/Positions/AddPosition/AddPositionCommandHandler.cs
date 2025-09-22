@@ -76,7 +76,8 @@ public class AddPositionCommandHandler : ICommandHandler<AddPositionCommand>
         var resultSave = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (resultSave.IsFailure)
             return resultSave.Error;
-        
+
+        _logger.LogInformation("Position with ID '{ID}' was successfully added.", position.Value.Id);
         return UnitResult.Success<ErrorList>();
     }
 }

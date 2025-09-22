@@ -1,7 +1,10 @@
-﻿namespace DirectoryService.Application.Interfaces.CQRS;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Contracts.Errors;
 
-public interface IQueryHandler<in TQuery, out TResponse>
+namespace DirectoryService.Application.Interfaces.CQRS;
+
+public interface IQueryHandler<in TQuery, TResponse>
     where TQuery : IQuery<TResponse>
 {
-    TResponse Handle(TQuery query, CancellationToken cancellationToken);
+    Task<Result<TResponse, ErrorList>> Handle(TQuery query, CancellationToken cancellationToken);
 }

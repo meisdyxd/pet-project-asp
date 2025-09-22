@@ -130,7 +130,7 @@ public class TransferDepartmentCommandHandler : ICommandHandler<TransferDepartme
         await _departmentsRepository.UpdateParentAsync(command.DepartmentId, command.Request.ParentId, cancellationToken);
         await _transactionManager.SaveChangesAsync(cancellationToken);
         transaction.Commit();
-
+        _logger.LogInformation("Department with id - '{fromId}' transfered to - '{toId}'", command.DepartmentId, command.Request.ParentId);
         return UnitResult.Success<ErrorList>();
     }
 }
