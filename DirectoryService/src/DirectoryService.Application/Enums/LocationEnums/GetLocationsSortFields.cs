@@ -2,6 +2,6 @@
 
 public enum GetLocationsSortFields
 {
-    Name,
-    CreatedAt
+    NAME,
+    CREATED_AT
 }

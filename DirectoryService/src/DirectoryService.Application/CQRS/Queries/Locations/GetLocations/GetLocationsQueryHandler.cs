@@ -2,27 +2,37 @@
 using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Enums.LocationEnums;
+using DirectoryService.Application.Extensions;
 using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Application.Interfaces.Database;
 using DirectoryService.Contracts.Dtos;
 using DirectoryService.Contracts.Errors;
 using DirectoryService.Contracts.Respones.LocationResponses;
+using FluentValidation;
 
 namespace DirectoryService.Application.CQRS.Queries.Locations.GetLocations;
 
 public class GetLocationsQueryHandler : IQueryHandler<GetLocationsQuery, GetLocationsResponse>
 {
     private readonly IDapperConnectionFactory _connectionFactory;
+    private readonly IValidator<GetLocationsQuery> _validator;
     
-    public GetLocationsQueryHandler(IDapperConnectionFactory connectionFactory)
+    public GetLocationsQueryHandler(
+        IDapperConnectionFactory connectionFactory,
+        IValidator<GetLocationsQuery> validator)
     {
         _connectionFactory = connectionFactory;
+        _validator = validator;
     }
     
     public async Task<Result<GetLocationsResponse, ErrorList>> Handle(
         GetLocationsQuery query,
         CancellationToken cancellationToken)
     {
+        var validationResult = await _validator.ValidateAsync(query);
+        if (!validationResult.IsValid)
+            return validationResult.ToErrorList();
+
         using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
 
         var querySql = new StringBuilder(@"
@@ -77,21 +87,18 @@ public class GetLocationsQueryHandler : IQueryHandler<GetLocationsQuery, GetLoca
             querySql.Append(string.Join(" AND ", whereClauses));
         }
         var orderByClauses = new List<string>();
-        var direction = query.Request.sortDirection?.ToUpper() ?? "ASC";
-        if (query.Request.sortBy is not null)
+        var direction = query.Request.SortDirection?.ToUpper() ?? "ASC";
+        if (query.Request.SortBy is not null)
         {
-            var fields = Enum.GetNames<GetLocationsSortFields>();
-            foreach (var sortBy in query.Request.sortBy)
+            foreach (var sortBy in query.Request.SortBy)
             {
-                if (fields.Contains(sortBy))
+                var sortString = Enum.Parse<GetLocationsSortFields>(sortBy) switch
                 {
-                    var sortString = (GetLocationsSortFields)Enum.Parse(typeof(GetLocationsSortFields), sortBy) switch
-                    {
-                        GetLocationsSortFields.Name => "l.name",
-                        GetLocationsSortFields.CreatedAt => "l.created_at"
-                    };
-                    orderByClauses.Add($"{sortString} {direction}");
-                }
+                    GetLocationsSortFields.NAME => "l.name",
+                    GetLocationsSortFields.CREATED_AT => "l.created_at",
+                    _ => throw new ArgumentException("Undefined sortBy field")
+                };
+                orderByClauses.Add($"{sortString} {direction}");
             }
         }
         
@@ -120,7 +127,7 @@ public class GetLocationsQueryHandler : IQueryHandler<GetLocationsQuery, GetLoca
             param: dynamicParameters);
         
         return new GetLocationsResponse(
-            result.ToList(),
+            [.. result],
             query.Request.Page,
             query.Request.PageSize,
             totalCount);
