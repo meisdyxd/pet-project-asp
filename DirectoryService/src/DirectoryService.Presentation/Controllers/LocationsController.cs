@@ -1,5 +1,7 @@
 ﻿using DirectoryService.Application.CQRS.Commands.Locations.AddLocation;
+using DirectoryService.Application.CQRS.Queries.Locations.GetLocations;
 using DirectoryService.Contracts.Requests;
+using DirectoryService.Contracts.Requests.CommonRequests;
 using DirectoryService.Contracts.Requests.LocationRequests;
 using DirectoryService.Presentation.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -21,5 +23,20 @@ public class LocationsController : MainController
             return result.Error.ToResponse();
         
         return Created();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get(
+        [FromQuery] Guid[]? departmentId,
+        [FromQuery] ParamsRequest paramsRequest,
+        [FromServices] GetLocationsQueryHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetLocationsQuery(departmentId, paramsRequest);
+        var result = await handler.Handle(query, cancellationToken);
+        if(result.IsFailure)
+            return result.Error.ToResponse();
+        
+        return Ok(result.Value);
     }
 }
