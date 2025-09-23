@@ -6,8 +6,9 @@ using DirectoryService.Application.Extensions;
 using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Application.Interfaces.Database;
 using DirectoryService.Contracts.Dtos;
+using DirectoryService.Contracts.Dtos.Locations;
 using DirectoryService.Contracts.Errors;
-using DirectoryService.Contracts.Respones.LocationResponses;
+using DirectoryService.Contracts.Responses.LocationResponses;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 

@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Contracts.Dtos;
+﻿namespace DirectoryService.Contracts.Dtos.Departments;
 
 public sealed record LockDepartmentDto(Guid id, string path, bool is_active, Guid parent_id)
 {

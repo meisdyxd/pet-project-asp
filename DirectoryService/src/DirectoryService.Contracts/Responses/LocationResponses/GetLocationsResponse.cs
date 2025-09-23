@@ -1,7 +1,7 @@
-﻿using DirectoryService.Contracts.Dtos;
-using DirectoryService.Contracts.Respones.CommonResponses;
+﻿using DirectoryService.Contracts.Dtos.Locations;
+using DirectoryService.Contracts.Responses.CommonResponses;
 
-namespace DirectoryService.Contracts.Respones.LocationResponses;
+namespace DirectoryService.Contracts.Responses.LocationResponses;
 
 public sealed record GetLocationsResponse : PaginationResponse
 {

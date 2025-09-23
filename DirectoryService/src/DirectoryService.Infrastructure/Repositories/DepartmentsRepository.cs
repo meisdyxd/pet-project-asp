@@ -7,6 +7,7 @@ using DirectoryService.Domain;
 using DirectoryService.Infrastructure.Database.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using DirectoryService.Contracts.Dtos.Departments;
 using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
 namespace DirectoryService.Infrastructure.Repositories;

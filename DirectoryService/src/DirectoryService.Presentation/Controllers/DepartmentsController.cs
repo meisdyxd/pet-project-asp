@@ -1,6 +1,7 @@
 ﻿using DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
 using DirectoryService.Application.CQRS.Commands.Departments.TransferDepartment;
 using DirectoryService.Application.CQRS.Commands.Departments.UpdateLocations;
+using DirectoryService.Application.CQRS.Queries.Departments.GetWithTopPositions;
 using DirectoryService.Contracts.Requests.DepartmentRequests;
 using DirectoryService.Presentation.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -52,5 +53,18 @@ public class DepartmentsController : MainController
             return result.Error.ToResponse();
 
         return Ok();
+    }
+
+    [HttpGet("top-positions")]
+    public async Task<IActionResult> GetWithTopPositions(
+        [FromServices] GetWithTopPositionsQueryHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new GetWithTopPositionsQuery();
+        var result = await handler.Handle(command, cancellationToken);
+        if(result.IsFailure)
+            return result.Error.ToResponse();
+        
+        return Ok(result.Value);
     }
 }

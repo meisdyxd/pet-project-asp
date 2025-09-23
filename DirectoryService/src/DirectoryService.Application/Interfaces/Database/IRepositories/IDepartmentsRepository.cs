@@ -3,6 +3,7 @@ using DirectoryService.Contracts.Dtos;
 using DirectoryService.Contracts.Errors;
 using DirectoryService.Domain;
 using System.Data;
+using DirectoryService.Contracts.Dtos.Departments;
 using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
 namespace DirectoryService.Application.Interfaces.Database.IRepositories;

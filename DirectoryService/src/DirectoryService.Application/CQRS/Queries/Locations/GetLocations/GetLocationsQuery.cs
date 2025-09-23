@@ -1,6 +1,6 @@
 ﻿using DirectoryService.Application.Interfaces.CQRS;
 using DirectoryService.Contracts.Requests.CommonRequests;
-using DirectoryService.Contracts.Respones.LocationResponses;
+using DirectoryService.Contracts.Responses.LocationResponses;
 
 namespace DirectoryService.Application.CQRS.Queries.Locations.GetLocations;
 
