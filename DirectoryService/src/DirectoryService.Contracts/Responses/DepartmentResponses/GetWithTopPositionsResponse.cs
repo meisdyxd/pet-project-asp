@@ -4,8 +4,7 @@ namespace DirectoryService.Contracts.Responses.DepartmentResponses;
 
 public sealed record GetWithTopPositionsResponse
 {
-    public GetWithTopPositionsResponse(
-        IEnumerable<GetWithTopPositionsDto> departments)
+    public GetWithTopPositionsResponse(IEnumerable<GetWithTopPositionsDto> departments)
     {
         Items = departments;
     }

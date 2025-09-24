@@ -11,7 +11,7 @@ public class GetLocationsQueryValidator : AbstractValidator<GetLocationsQuery>
     public GetLocationsQueryValidator()
     {
         RuleForEach(q => q.DepartmentIds)
-            .Must(id => id != Guid.Empty)
+            .Must(id => id != default)
             .WithError("departmentIds", "Department Id is default value")
             .When(q => q.DepartmentIds != null);
 
