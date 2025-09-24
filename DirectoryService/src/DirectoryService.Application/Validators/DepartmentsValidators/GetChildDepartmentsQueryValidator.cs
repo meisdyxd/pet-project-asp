@@ -11,11 +11,11 @@ public class GetChildDepartmentsQueryValidator : AbstractValidator<GetChildDepar
     {
         RuleFor(q => q.Page)
             .Must(p => p > 0)
-            .WithError("page", "Page amount must be greater than 0.");
+            .WithError("page", "Page must be greater than 0.");
         
         RuleFor(q => q.PageSize)
             .Must(p => p > 0)
-            .WithError("pageSize", "PageSize amount must be greater than 0.");
+            .WithError("pageSize", "PageSize must be greater than 0.");
         
         RuleFor(q => q.ParentId)
             .NotEmpty()
