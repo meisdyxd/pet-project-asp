@@ -1,6 +1,8 @@
 ﻿using DirectoryService.Application.CQRS.Commands.Departments.AddDepartment;
 using DirectoryService.Application.CQRS.Commands.Departments.TransferDepartment;
 using DirectoryService.Application.CQRS.Commands.Departments.UpdateLocations;
+using DirectoryService.Application.CQRS.Queries.Departments.GetChildDepartments;
+using DirectoryService.Application.CQRS.Queries.Departments.GetRootDepartmentsWithChilds;
 using DirectoryService.Application.CQRS.Queries.Departments.GetWithTopPositions;
 using DirectoryService.Contracts.Requests.DepartmentRequests;
 using DirectoryService.Presentation.Extensions;
@@ -62,6 +64,38 @@ public class DepartmentsController : MainController
     {
         var command = new GetWithTopPositionsQuery();
         var result = await handler.Handle(command, cancellationToken);
+        if(result.IsFailure)
+            return result.Error.ToResponse();
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("roots")]
+    public async Task<IActionResult> GetRootsWithChildrens(
+        [FromServices] GetRootDepartmentsWithChildsQueryHandler handler,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] int? prefetch,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetRootDepartmentsWithChildsQuery(page, pageSize, prefetch);
+        var result = await handler.Handle(query, cancellationToken);
+        if(result.IsFailure)
+            return result.Error.ToResponse();
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("{departmentId:guid}/children")]
+    public async Task<IActionResult> GetChildrens(
+        [FromServices] GetChildDepartmentsQueryHandler handler,
+        [FromRoute] Guid departmentId,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetChildDepartmentsQuery(departmentId, page, pageSize);
+        var result = await handler.Handle(query, cancellationToken);
         if(result.IsFailure)
             return result.Error.ToResponse();
         
