@@ -1,22 +1,17 @@
-﻿namespace DirectoryService.Contracts.Dtos;
+﻿namespace DirectoryService.Contracts.Dtos.Commons;
 
-public sealed record GetLocationDto
+public sealed record AddressDto
 {
-    public GetLocationDto(
-        Guid id,
-        string name,
+    public AddressDto(
         string country,
         string region,
-        string city, 
+        string city,
         string street,
         string houseNumber,
         string? postalCode,
         string? district,
-        string? building,
-        string timezone)
+        string? building)
     {
-        Id = id;
-        Name = name;
         Country = country;
         Region = region;
         City = city;
@@ -25,12 +20,8 @@ public sealed record GetLocationDto
         PostalCode = postalCode;
         District = district;
         Building = building;
-        Timezone = timezone;
     }
 
-    public Guid Id { get; init; }
-    public string Name { get; init; }
-    public string Timezone { get; init; }
     public string Country { get; init; }
     public string Region { get; init; }
     public string City { get; init; }

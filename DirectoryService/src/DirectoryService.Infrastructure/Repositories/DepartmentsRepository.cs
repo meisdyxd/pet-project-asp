@@ -7,6 +7,7 @@ using DirectoryService.Domain;
 using DirectoryService.Infrastructure.Database.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using DirectoryService.Contracts.Dtos.Departments;
 using Path = DirectoryService.Domain.ValueObjects.Department.Path;
 
 namespace DirectoryService.Infrastructure.Repositories;
@@ -102,7 +103,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         });
 
         var cmd = new CommandDefinition(@"
-            SELECT src.id, src.""path"", src.is_active, src.parent_id
+            SELECT src.id, src.""path"", src.is_active ""isActive"", src.parent_id ""parentId""
             FROM public.departments s
             JOIN public.departments src ON src.id = @DepartmentId
             WHERE s.""path""::ltree <@ src.""path""::ltree

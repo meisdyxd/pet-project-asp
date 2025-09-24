@@ -7,4 +7,8 @@
     <UserSecretsId>07f4b389-0a47-4034-8a0d-a42d5d6a1a0b</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\Positions\" />
+  </ItemGroup>
+
 </Project>

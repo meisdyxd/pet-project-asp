@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Contracts.Respones.CommonResponses;
+﻿namespace DirectoryService.Contracts.Responses.CommonResponses;
 
 public record PaginationResponse
 {
